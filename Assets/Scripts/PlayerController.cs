@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject endScoreBest;
     public GameObject inGameGUI;
     public GameObject explosionPrefab;
+    public AudioClip[] movementSounds;
 
     //NOTE: If I want score at end of game, divide Y by 2.5
 
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour {
     private Animator playerAnimator;
     private Animator losePanelAnimator;
     private Spawner rockSpawner;
+    private AudioSource audioSource;
     private bool isShipOnLeft;
     private int score;
     private bool isGameOver;
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour {
         playerAnimator = this.gameObject.GetComponent<Animator>();
         cameraAnimator = cameraObject.GetComponent<Animator>();
         losePanelAnimator = losePanel.GetComponent<Animator>();
+        audioSource = this.gameObject.GetComponent<AudioSource>();
 
         //distanceText = GetComponent<Text>();
         score = 0;
@@ -77,10 +80,16 @@ public class PlayerController : MonoBehaviour {
                 }
             }
 
+            playMovementAudio();
             rockSpawner.spawnRocksIfNeeded();
             incrementScore();
             moveCamera();
         }
+    }
+
+    private void playMovementAudio() {
+        audioSource.clip = movementSounds[Random.Range(0, movementSounds.Length - 1)];
+        audioSource.Play();
     }
 
     public static void AddExplosionForce(Rigidbody2D body, float expForce, Vector3 expPosition, float expRadius) {
@@ -120,6 +129,7 @@ public class PlayerController : MonoBehaviour {
     //}
 
     private void triggerEndGame() {
+
         showEndScreen();
         isGameOver = true;
 
@@ -127,6 +137,9 @@ public class PlayerController : MonoBehaviour {
 
         //TODO: NEED TO IMPLEMENT BEST
         endScoreBest.GetComponent<Text>().text = "Error";
+
+        //hide player
+        gameObject.SetActive(false);
 
     }
 
