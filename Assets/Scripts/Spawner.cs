@@ -42,6 +42,19 @@ public class Spawner : MonoBehaviour {
             spawnRocks(rocksSpawnedAtOnce);
         }
         shipsCurrentRockLevel++;
+        spawnBackgroundFlyingRock();
+
+
+    }
+
+    private void spawnBackgroundFlyingRock() {
+        GameObject rock = Instantiate(astroidPrefab, new Vector3(5, shipsCurrentRockLevel + 1), Quaternion.identity) as GameObject;
+
+        rock.transform.localScale = new Vector3(0.3f, 0.3f);
+        rock.transform.position -= new Vector3(0f, 0f, 2);
+        Rigidbody2D rockBod = rock.GetComponent<Rigidbody2D>();
+        rockBod.isKinematic = false;
+        rockBod.velocity = Vector3.left;
     }
 
     private void spawnPlayer() {

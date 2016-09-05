@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject spawnerObject;
     public GameObject cameraObject;
     public GameObject losePanel;
+    public GameObject backgroundObject;
     public GameObject endScoreText;
     public GameObject endScoreBest;
     public GameObject inGameGUI;
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour {
     private Animator cameraAnimator;
     private Animator playerAnimator;
     private Animator losePanelAnimator;
+    private Animator backgroundAnimator;
     private Spawner rockSpawner;
     private AudioSource audioSource;
     private bool isShipOnLeft;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour {
         cameraAnimator = cameraObject.GetComponent<Animator>();
         losePanelAnimator = losePanel.GetComponent<Animator>();
         audioSource = this.gameObject.GetComponent<AudioSource>();
+        backgroundAnimator = backgroundObject.GetComponent<Animator>();
 
         //distanceText = GetComponent<Text>();
         score = 0;
@@ -84,6 +87,7 @@ public class PlayerController : MonoBehaviour {
             rockSpawner.spawnRocksIfNeeded();
             incrementScore();
             moveCamera();
+            moveBackground();
         }
     }
 
@@ -161,6 +165,10 @@ public class PlayerController : MonoBehaviour {
 
     private void moveCamera() {
         cameraAnimator.Play("moveCameraUp");
+    }
+
+    private void moveBackground() {
+        backgroundAnimator.Play("Move");
     }
 
     private void playMoveAnimation(string animationName) {
