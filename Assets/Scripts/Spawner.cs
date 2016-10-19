@@ -9,8 +9,8 @@ public class Spawner : MonoBehaviour {
     public GameObject playerPrefab;
     private GameObject parentObject;
 
-    private float leftSideX = -1.5f;
-    private float rightSideX = 1.5f;
+    private const float LEFTSIDEX = -1.5f;
+    private const float RIGHTSIDEX = 1.5f;
     private float currenty =  2.5f;
     private int obsticalZ = 0;
     private int shipsCurrentRockLevel = 0;
@@ -19,7 +19,9 @@ public class Spawner : MonoBehaviour {
     private List<GameObject> rocks;
     
 
-	// Use this for initialization
+    /// <summary>
+    /// Starts this game object
+    /// </summary>
 	void Start () {
 
         rocks = new List<GameObject>();
@@ -29,11 +31,16 @@ public class Spawner : MonoBehaviour {
 
 	}
 	
-	// Update is called once per frame
+    /// <summary>
+    /// Updates every frame
+    /// </summary>
 	void Update () {
 	
 	}
 
+    /// <summary>
+    /// Spawns rocks if they are needed
+    /// </summary>
     public void spawnRocksIfNeeded() {
         if (shipsCurrentRockLevel + 5 > rocks.Count) {
             //need more rocks
@@ -43,22 +50,24 @@ public class Spawner : MonoBehaviour {
         }
         shipsCurrentRockLevel++;
         spawnBackgroundFlyingRock();
-
-
     }
 
+    /// <summary>
+    /// Spawn flying rocks in the background.
+    /// </summary>
     private void spawnBackgroundFlyingRock() {
-        GameObject rock = Instantiate(astroidPrefab, new Vector3(5, shipsCurrentRockLevel + 1), Quaternion.identity) as GameObject;
+        GameObject rock = Instantiate(astroidPrefab, new Vector3(5, Random.Range(currenty + 2f, currenty - 2f)), Quaternion.identity) as GameObject;
 
         rock.transform.localScale = new Vector3(0.3f, 0.3f);
-        rock.transform.position -= new Vector3(0f, 0f, 2);
+        rock.transform.position -= new Vector3(0f, 0f, 5f); //Move rock into background
         Rigidbody2D rockBod = rock.GetComponent<Rigidbody2D>();
         rockBod.isKinematic = false;
         rockBod.velocity = Vector3.left;
     }
 
+
     private void spawnPlayer() {
-        Instantiate(playerPrefab, new Vector3(getRandomSide(), currenty), Quaternion.identity);
+        Instantiate(playerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
     }
@@ -67,19 +76,36 @@ public class Spawner : MonoBehaviour {
 
         for (int i = 0; i < iterations; i++) {
 
-            rocks.Add((GameObject)  Instantiate(astroidPrefab, new Vector3(getRandomSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
+            rocks.Add((GameObject)  Instantiate(astroidPrefab, new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
             currenty += 2.5f;
         }
     }
 
-    private float getRandomSide() {
+    private float getRandomFixedSide() {
         float randSideX;
 
         //randomly choose left or right
         if (Random.value > 0.5) {
-            randSideX = leftSideX;
+            randSideX = LEFTSIDEX;
         } else {
-            randSideX = rightSideX;
+            randSideX = RIGHTSIDEX;
+        }
+
+        return randSideX;
+    }
+
+    private float getRandomBackgroundRockSide()
+    {
+        float randSideX;
+
+        //randomly choose left or right
+        if (Random.value > 0.5)
+        {
+            randSideX = LEFTSIDEX - 2f;
+        }
+        else
+        {
+            randSideX = RIGHTSIDEX + 2f;
         }
 
         return randSideX;
