@@ -47,22 +47,50 @@ public class Spawner : MonoBehaviour {
             Debug.Log(shipsCurrentRockLevel);
             Debug.Log(rocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
+            spawnBackgroundFlyingRock();
         }
         shipsCurrentRockLevel++;
-        spawnBackgroundFlyingRock();
+        //spawnBackgroundFlyingRock();
     }
 
     /// <summary>
     /// Spawn flying rocks in the background.
     /// </summary>
     private void spawnBackgroundFlyingRock() {
-        GameObject rock = Instantiate(astroidPrefab, new Vector3(5, Random.Range(currenty + 2f, currenty - 2f)), Quaternion.identity) as GameObject;
+        float backgroundLevel = Random.Range(1f, 10f);
+        float spawningY = Random.Range(currenty + 2f, currenty - 2f);
+        float spawningSide = getRandomBackgroundRockSide();
 
-        rock.transform.localScale = new Vector3(0.3f, 0.3f);
-        rock.transform.position -= new Vector3(0f, 0f, 5f); //Move rock into background
-        Rigidbody2D rockBod = rock.GetComponent<Rigidbody2D>();
-        rockBod.isKinematic = false;
-        rockBod.velocity = Vector3.left;
+        GameObject rock = Instantiate(astroidPrefab, new Vector3(spawningSide, spawningY, backgroundLevel), Quaternion.identity) as GameObject;
+
+        //set scale
+        rock.transform.localScale = GetRandomScale();
+
+        //set darkness to simulate distance
+        float darknessScale = Random.Range(20f, 200f);
+        rock.GetComponent<SpriteRenderer>().color += new Color(darknessScale, darknessScale, darknessScale, 255f);
+        Debug.Log(rock.GetComponent<SpriteRenderer>().color);
+
+        //set velocity
+        Rigidbody2D rockRigidBody = rock.GetComponent<Rigidbody2D>();
+        rockRigidBody.isKinematic = false;  //Cannot be Kinematic 
+        rockRigidBody.velocity = GetRandomVelocity();
+
+        //Disable collider
+        rock.GetComponent<CircleCollider2D>().enabled = false;
+    }
+
+    private Vector3 GetRandomScale()
+    {
+        float randomScale = Random.Range(0.01f, 1f);
+        return new Vector3(randomScale, randomScale);
+    }
+
+    private Vector3 GetRandomVelocity()
+    {
+        float ranx = Random.Range(-5f, 5f);
+        float rany = Random.Range(-5f, 5f);
+        return new Vector3(ranx, rany);
     }
 
 
