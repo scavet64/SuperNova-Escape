@@ -13,7 +13,7 @@ public class Spawner : MonoBehaviour {
     private const float RIGHTSIDEX = 1.5f;
     private float currenty =  2.5f;
     private int obsticalZ = 0;
-    private int shipsCurrentRockLevel = 0;
+    private float shipsCurrentRockLevel = 0;
     private int rocksSpawnedAtOnce = 5;
 
     private List<GameObject> rocks;
@@ -49,7 +49,7 @@ public class Spawner : MonoBehaviour {
             spawnRocks(rocksSpawnedAtOnce);
             spawnBackgroundFlyingRock();
         }
-        shipsCurrentRockLevel++;
+        shipsCurrentRockLevel += 2.5f;
         //spawnBackgroundFlyingRock();
     }
 
@@ -58,7 +58,7 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void spawnBackgroundFlyingRock() {
         float backgroundLevel = Random.Range(1f, 10f);
-        float spawningY = Random.Range(currenty + 2f, currenty - 2f);
+        float spawningY = Random.Range(shipsCurrentRockLevel + 4f, shipsCurrentRockLevel - 0f);
         float spawningSide = getRandomBackgroundRockSide();
 
         GameObject rock = Instantiate(astroidPrefab, new Vector3(spawningSide, spawningY, backgroundLevel), Quaternion.identity) as GameObject;
