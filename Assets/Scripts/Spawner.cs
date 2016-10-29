@@ -2,33 +2,71 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class Spawner : MonoBehaviour {
 
-    public GameObject astroidPrefab;
-    public GameObject playerPrefab;
+    /********** vv Set in Editor vv **********/
+
+    /// <summary>
+    /// Player prefab object
+    /// </summary>
+    public GameObject PlayerPrefab;
+
+    /// <summary>
+    /// Array containing all of then astroid prefabs
+    /// </summary>
+    public GameObject[] AstroidPrefabs;
+
+    /********** ^^ Set in Editor ^^ **********/
+
+    /// <summary>
+    /// Parent GameObject to hold the astroids
+    /// </summary>
     private GameObject parentObject;
 
+    /// <summary>
+    /// Constant for left side x position
+    /// </summary>
     private const float LEFTSIDEX = -1.5f;
+
+    /// <summary>
+    /// Constant for the right side x position
+    /// </summary>
     private const float RIGHTSIDEX = 1.5f;
+
+    /// <summary>
+    /// Current player y position
+    /// </summary>
     private float currenty =  2.5f;
-    private int obsticalZ = 0;
+
+    /// <summary>
+    /// Obstical astroid z position
+    /// </summary>
+    private const int obsticalZ = 0;
+
+    /// <summary>
+    /// The current rock level for the player
+    /// </summary>
     private float shipsCurrentRockLevel = 0;
-    private int rocksSpawnedAtOnce = 5;
 
-    private List<GameObject> rocks;
+    /// <summary>
+    /// The number of rocks spawned at a single time.
+    /// </summary>
+    private const int rocksSpawnedAtOnce = 5;
+
+    /// <summary>
+    /// List containing all of the spawned rocks
+    /// </summary>
+    private List<GameObject> currentSpawnedRocks;
     
-
     /// <summary>
     /// Starts this game object
     /// </summary>
 	void Start () {
 
-        rocks = new List<GameObject>();
+        currentSpawnedRocks = new List<GameObject>();
 
         //spawnPlayer();
         spawnRocks(rocksSpawnedAtOnce);
-
 	}
 	
     /// <summary>
@@ -42,10 +80,10 @@ public class Spawner : MonoBehaviour {
     /// Spawns rocks if they are needed
     /// </summary>
     public void spawnRocksIfNeeded() {
-        if (shipsCurrentRockLevel + 5 > rocks.Count) {
+        if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) {
             //need more rocks
             Debug.Log(shipsCurrentRockLevel);
-            Debug.Log(rocks.Count);
+            Debug.Log(currentSpawnedRocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
             spawnBackgroundFlyingRock();
         }
@@ -60,8 +98,9 @@ public class Spawner : MonoBehaviour {
         float backgroundLevel = Random.Range(1f, 10f);
         float spawningY = Random.Range(shipsCurrentRockLevel + 4f, shipsCurrentRockLevel - 0f);
         float spawningSide = getRandomBackgroundRockSide();
+        GameObject randomAstroid = GetRandomAstroid();
 
-        GameObject rock = Instantiate(astroidPrefab, new Vector3(spawningSide, spawningY, backgroundLevel), Quaternion.identity) as GameObject;
+        GameObject rock = Instantiate(randomAstroid, new Vector3(spawningSide, spawningY, backgroundLevel), Quaternion.identity) as GameObject;
 
         //set scale
         rock.transform.localScale = GetRandomScale();
@@ -77,15 +116,33 @@ public class Spawner : MonoBehaviour {
         rockRigidBody.velocity = GetRandomVelocity();
 
         //Disable collider
-        rock.GetComponent<CircleCollider2D>().enabled = false;
+        rock.GetComponent<CircleCollider2D>().isTrigger = true;
+        rock.gameObject.tag = "";
     }
 
+    /// <summary>
+    /// Returns a random astroid astroid prefab from the list
+    /// </summary>
+    /// <returns>Random Astroid Prefab</returns>
+    private GameObject GetRandomAstroid()
+    {
+        return AstroidPrefabs[Random.Range(0, AstroidPrefabs.Length)];
+    }
+
+    /// <summary>
+    /// Returns a vector 3 that should be used to set the scale
+    /// </summary>
+    /// <returns>vector3 with random X and Y values</returns>
     private Vector3 GetRandomScale()
     {
         float randomScale = Random.Range(0.01f, 1f);
         return new Vector3(randomScale, randomScale);
     }
 
+    /// <summary>
+    /// Returns a Vector3 with random X and Y values that should be used for velocity
+    /// </summary>
+    /// <returns>Vector3 with random X and Y values</returns>
     private Vector3 GetRandomVelocity()
     {
         float ranx = Random.Range(-5f, 5f);
@@ -93,22 +150,32 @@ public class Spawner : MonoBehaviour {
         return new Vector3(ranx, rany);
     }
 
-
+    /// <summary>
+    /// Spawn the player on a random side
+    /// </summary>
     private void spawnPlayer() {
-        Instantiate(playerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
+        Instantiate(PlayerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
     }
 
+    /// <summary>
+    /// spawn a rock the passed in number of times. This method spawns a random astroid
+    /// </summary>
+    /// <param name="iterations">Number of rocks to spawn</param>
     private void spawnRocks(int iterations) {
 
         for (int i = 0; i < iterations; i++) {
 
-            rocks.Add((GameObject)  Instantiate(astroidPrefab, new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
+            currentSpawnedRocks.Add((GameObject)  Instantiate(GetRandomAstroid(), new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
             currenty += 2.5f;
         }
     }
 
+    /// <summary>
+    /// Get random fixed side.
+    /// </summary>
+    /// <returns>Returns one of the set side float values</returns>
     private float getRandomFixedSide() {
         float randSideX;
 
@@ -122,6 +189,10 @@ public class Spawner : MonoBehaviour {
         return randSideX;
     }
 
+    /// <summary>
+    /// Returns a random side for the background rocks
+    /// </summary>
+    /// <returns></returns>
     private float getRandomBackgroundRockSide()
     {
         float randSideX;
@@ -129,13 +200,12 @@ public class Spawner : MonoBehaviour {
         //randomly choose left or right
         if (Random.value > 0.5)
         {
-            randSideX = LEFTSIDEX - 2f;
+            randSideX = LEFTSIDEX - 3f;
         }
         else
         {
-            randSideX = RIGHTSIDEX + 2f;
+            randSideX = RIGHTSIDEX + 3f;
         }
-
         return randSideX;
     }
 }
