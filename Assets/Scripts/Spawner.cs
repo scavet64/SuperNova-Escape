@@ -2,86 +2,210 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class Spawner : MonoBehaviour {
 
-    public GameObject astroidPrefab;
-    public GameObject playerPrefab;
+    /********** vv Set in Editor vv **********/
+
+    /// <summary>
+    /// Player prefab object
+    /// </summary>
+    public GameObject PlayerPrefab;
+
+    /// <summary>
+    /// Array containing all of then astroid prefabs
+    /// </summary>
+    public GameObject[] AstroidPrefabs;
+
+    /********** ^^ Set in Editor ^^ **********/
+
+    /// <summary>
+    /// Parent GameObject to hold the astroids
+    /// </summary>
     private GameObject parentObject;
 
-    private float leftSideX = -1.5f;
-    private float rightSideX = 1.5f;
+    /// <summary>
+    /// Constant for left side x position
+    /// </summary>
+    private const float LEFTSIDEX = -1.5f;
+
+    /// <summary>
+    /// Constant for the right side x position
+    /// </summary>
+    private const float RIGHTSIDEX = 1.5f;
+
+    /// <summary>
+    /// Current player y position
+    /// </summary>
     private float currenty =  2.5f;
-    private int obsticalZ = 0;
-    private int shipsCurrentRockLevel = 0;
-    private int rocksSpawnedAtOnce = 5;
 
-    private List<GameObject> rocks;
+    /// <summary>
+    /// Obstical astroid z position
+    /// </summary>
+    private const int obsticalZ = 0;
+
+    /// <summary>
+    /// The current rock level for the player
+    /// </summary>
+    private float shipsCurrentRockLevel = 0;
+
+    /// <summary>
+    /// The number of rocks spawned at a single time.
+    /// </summary>
+    private const int rocksSpawnedAtOnce = 5;
+
+    /// <summary>
+    /// List containing all of the spawned rocks
+    /// </summary>
+    private List<GameObject> currentSpawnedRocks;
     
-
-	// Use this for initialization
+    /// <summary>
+    /// Starts this game object
+    /// </summary>
 	void Start () {
 
-        rocks = new List<GameObject>();
+        currentSpawnedRocks = new List<GameObject>();
 
         //spawnPlayer();
         spawnRocks(rocksSpawnedAtOnce);
-
 	}
 	
-	// Update is called once per frame
+    /// <summary>
+    /// Updates every frame
+    /// </summary>
 	void Update () {
 	
 	}
 
+    /// <summary>
+    /// Spawns rocks if they are needed
+    /// </summary>
     public void spawnRocksIfNeeded() {
-        if (shipsCurrentRockLevel + 5 > rocks.Count) {
+        if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) {
             //need more rocks
             Debug.Log(shipsCurrentRockLevel);
-            Debug.Log(rocks.Count);
+            Debug.Log(currentSpawnedRocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
+            spawnBackgroundFlyingRock();
         }
-        shipsCurrentRockLevel++;
-        spawnBackgroundFlyingRock();
-
-
+        shipsCurrentRockLevel += 2.5f;
+        //spawnBackgroundFlyingRock();
     }
 
+    /// <summary>
+    /// Spawn flying rocks in the background.
+    /// </summary>
     private void spawnBackgroundFlyingRock() {
-        GameObject rock = Instantiate(astroidPrefab, new Vector3(5, shipsCurrentRockLevel + 1), Quaternion.identity) as GameObject;
+        float backgroundLevel = Random.Range(1f, 10f);
+        float spawningY = Random.Range(shipsCurrentRockLevel + 4f, shipsCurrentRockLevel - 0f);
+        float spawningSide = getRandomBackgroundRockSide();
+        GameObject randomAstroid = GetRandomAstroid();
 
-        rock.transform.localScale = new Vector3(0.3f, 0.3f);
-        rock.transform.position -= new Vector3(0f, 0f, 2);
-        Rigidbody2D rockBod = rock.GetComponent<Rigidbody2D>();
-        rockBod.isKinematic = false;
-        rockBod.velocity = Vector3.left;
+        GameObject rock = Instantiate(randomAstroid, new Vector3(spawningSide, spawningY, backgroundLevel), Quaternion.identity) as GameObject;
+
+        //set scale
+        rock.transform.localScale = GetRandomScale();
+
+        //set darkness to simulate distance
+        float darknessScale = Random.Range(20f, 200f);
+        rock.GetComponent<SpriteRenderer>().color += new Color(darknessScale, darknessScale, darknessScale, 255f);
+        Debug.Log(rock.GetComponent<SpriteRenderer>().color);
+
+        //set velocity
+        Rigidbody2D rockRigidBody = rock.GetComponent<Rigidbody2D>();
+        rockRigidBody.isKinematic = false;  //Cannot be Kinematic 
+        rockRigidBody.velocity = GetRandomVelocity();
+
+        //Disable collider
+        rock.GetComponent<CircleCollider2D>().isTrigger = true;
+        rock.gameObject.tag = "";
     }
 
+    /// <summary>
+    /// Returns a random astroid astroid prefab from the list
+    /// </summary>
+    /// <returns>Random Astroid Prefab</returns>
+    private GameObject GetRandomAstroid()
+    {
+        return AstroidPrefabs[Random.Range(0, AstroidPrefabs.Length)];
+    }
+
+    /// <summary>
+    /// Returns a vector 3 that should be used to set the scale
+    /// </summary>
+    /// <returns>vector3 with random X and Y values</returns>
+    private Vector3 GetRandomScale()
+    {
+        float randomScale = Random.Range(0.01f, 1f);
+        return new Vector3(randomScale, randomScale);
+    }
+
+    /// <summary>
+    /// Returns a Vector3 with random X and Y values that should be used for velocity
+    /// </summary>
+    /// <returns>Vector3 with random X and Y values</returns>
+    private Vector3 GetRandomVelocity()
+    {
+        float ranx = Random.Range(-5f, 5f);
+        float rany = Random.Range(-5f, 5f);
+        return new Vector3(ranx, rany);
+    }
+
+    /// <summary>
+    /// Spawn the player on a random side
+    /// </summary>
     private void spawnPlayer() {
-        Instantiate(playerPrefab, new Vector3(getRandomSide(), currenty), Quaternion.identity);
+        Instantiate(PlayerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
     }
 
+    /// <summary>
+    /// spawn a rock the passed in number of times. This method spawns a random astroid
+    /// </summary>
+    /// <param name="iterations">Number of rocks to spawn</param>
     private void spawnRocks(int iterations) {
 
         for (int i = 0; i < iterations; i++) {
 
-            rocks.Add((GameObject)  Instantiate(astroidPrefab, new Vector3(getRandomSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
+            currentSpawnedRocks.Add((GameObject)  Instantiate(GetRandomAstroid(), new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
             currenty += 2.5f;
         }
     }
 
-    private float getRandomSide() {
+    /// <summary>
+    /// Get random fixed side.
+    /// </summary>
+    /// <returns>Returns one of the set side float values</returns>
+    private float getRandomFixedSide() {
         float randSideX;
 
         //randomly choose left or right
         if (Random.value > 0.5) {
-            randSideX = leftSideX;
+            randSideX = LEFTSIDEX;
         } else {
-            randSideX = rightSideX;
+            randSideX = RIGHTSIDEX;
         }
 
+        return randSideX;
+    }
+
+    /// <summary>
+    /// Returns a random side for the background rocks
+    /// </summary>
+    /// <returns></returns>
+    private float getRandomBackgroundRockSide()
+    {
+        float randSideX;
+
+        //randomly choose left or right
+        if (Random.value > 0.5)
+        {
+            randSideX = LEFTSIDEX - 3f;
+        }
+        else
+        {
+            randSideX = RIGHTSIDEX + 3f;
+        }
         return randSideX;
     }
 }

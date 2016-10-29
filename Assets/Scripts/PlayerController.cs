@@ -109,14 +109,14 @@ public class PlayerController : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D otherBox) {
         Debug.Log("triggered");
         Debug.Log(transform.position);
-
-        AddExplosionForce(otherBox.GetComponent<Rigidbody2D>(), 100, this.transform.position, 3f);
-
-        //trigger endgame
-        Instantiate(explosionPrefab,this.transform.position, Quaternion.identity);
-
-        triggerEndGame();
-
+        Debug.Log(otherBox.gameObject.tag);
+        if (otherBox.gameObject.tag.Equals("Obstacle"))
+        {
+            //Game over
+            AddExplosionForce(otherBox.GetComponent<Rigidbody2D>(), 100, this.transform.position, 3f);
+            Instantiate(explosionPrefab, this.transform.position, Quaternion.identity);
+            triggerEndGame();
+        }
     }
 
     //void OnCollisionEnter2D(Collision2D otherBox) {
