@@ -70,10 +70,19 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private List<GameObject> currentSpawnedRocks;
 
+    /// <summary>
+    /// This counts the number of times the player has jumped. This is used to indicate when we should spawn another background image
+    /// </summary>
     private int timeSinceLastBackgroundSpawn = 249;
 
+    /// <summary>
+    /// This number represnets the number of jumps a player must make until a new background image is spawned.
+    /// </summary>
     private int spawnBackgroundAfter = 250;
 
+    /// <summary>
+    /// The next Y position the new background image will have.
+    /// </summary>
     private int nextBackgroundSpawnY = 18;
     
     /// <summary>
@@ -135,8 +144,8 @@ public class Spawner : MonoBehaviour {
         rock.transform.localScale = GetRandomScale();
 
         //set darkness to simulate distance
-        float darknessScale = Random.Range(20f, 200f);
-        rock.GetComponent<SpriteRenderer>().color += new Color(darknessScale, darknessScale, darknessScale, 255f);
+        float darknessScale = Random.Range(0.4f, 0.8f);
+        rock.GetComponent<SpriteRenderer>().color = new Color(darknessScale, darknessScale, darknessScale, 1);
         Debug.Log(rock.GetComponent<SpriteRenderer>().color);
 
         //set velocity
@@ -147,7 +156,7 @@ public class Spawner : MonoBehaviour {
         //Disable collider
         rock.GetComponent<CircleCollider2D>().isTrigger = true;
         rock.gameObject.tag = "Background";
-        Debug.Log("Finished Spawining Rock");
+        Debug.Log("Finished Spawning Rock");
     }
 
     /// <summary>
@@ -189,6 +198,9 @@ public class Spawner : MonoBehaviour {
         spawnRocks(1);
     }
 
+    /// <summary>
+    /// Spawn a new background image and add it to the parent game object.
+    /// </summary>
     private void spawnBackground() {
         GameObject newBack = (GameObject) Instantiate(BackgroundPrefab, new Vector3(0, nextBackgroundSpawnY), Quaternion.identity);
         newBack.transform.parent = backgroundGameObject.transform;
