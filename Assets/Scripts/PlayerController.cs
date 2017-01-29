@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     public GameObject endScoreBest;
     public GameObject inGameGUI;
     public GameObject explosionPrefab;
+    public GameObject BackgroundPrefab;
     public AudioClip[] movementSounds;
 
     //NOTE: If I want score at end of game, divide Y by 2.5
@@ -85,9 +86,11 @@ public class PlayerController : MonoBehaviour {
 
             playMovementAudio();
             rockSpawner.spawnRocksIfNeeded();
+            rockSpawner.spawnBackgroundIfNeeded();
             incrementScore();
             moveCamera();
             moveBackground();
+            
         }
     }
 

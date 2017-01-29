@@ -16,6 +16,13 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     public GameObject[] AstroidPrefabs;
 
+    /// <summary>
+    /// Background prefab object
+    /// </summary>
+    public GameObject BackgroundPrefab;
+
+    public GameObject backgroundGameObject;
+
     /********** ^^ Set in Editor ^^ **********/
 
     /// <summary>
@@ -44,9 +51,14 @@ public class Spawner : MonoBehaviour {
     private const int obsticalZ = 0;
 
     /// <summary>
-    /// The current rock level for the player
+    /// The current y position for the current rock level
     /// </summary>
-    private float shipsCurrentRockLevel = 0;
+    private float shipsCurrentYRockLevel = 0;
+
+    /// <summary>
+    /// Current rock the player is on.
+    /// </summary>
+    private int shipsCurrentRockLevel;
 
     /// <summary>
     /// The number of rocks spawned at a single time.
@@ -57,6 +69,12 @@ public class Spawner : MonoBehaviour {
     /// List containing all of the spawned rocks
     /// </summary>
     private List<GameObject> currentSpawnedRocks;
+
+    private int timeSinceLastBackgroundSpawn = 249;
+
+    private int spawnBackgroundAfter = 250;
+
+    private int nextBackgroundSpawnY = 18;
     
     /// <summary>
     /// Starts this game object
@@ -82,13 +100,24 @@ public class Spawner : MonoBehaviour {
     public void spawnRocksIfNeeded() {
         if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) {
             //need more rocks
-            Debug.Log(shipsCurrentRockLevel);
+            Debug.Log(shipsCurrentYRockLevel);
             Debug.Log(currentSpawnedRocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
             spawnBackgroundFlyingRock();
         }
-        shipsCurrentRockLevel += 2.5f;
+        shipsCurrentRockLevel++;
+        shipsCurrentYRockLevel += 2.5f;
         //spawnBackgroundFlyingRock();
+    }
+
+    public void spawnBackgroundIfNeeded() {
+        if(timeSinceLastBackgroundSpawn > spawnBackgroundAfter) {
+            spawnBackground();
+            timeSinceLastBackgroundSpawn = 0;
+        } else {
+            timeSinceLastBackgroundSpawn++;
+        }
+
     }
 
     /// <summary>
@@ -96,7 +125,7 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void spawnBackgroundFlyingRock() {
         float backgroundLevel = Random.Range(1f, 10f);
-        float spawningY = Random.Range(shipsCurrentRockLevel + 4f, shipsCurrentRockLevel - 0f);
+        float spawningY = Random.Range(shipsCurrentYRockLevel + 4f, shipsCurrentYRockLevel - 0f);
         float spawningSide = getRandomBackgroundRockSide();
         GameObject randomAstroid = GetRandomAstroid();
 
@@ -117,7 +146,8 @@ public class Spawner : MonoBehaviour {
 
         //Disable collider
         rock.GetComponent<CircleCollider2D>().isTrigger = true;
-        rock.gameObject.tag = "";
+        rock.gameObject.tag = "Background";
+        Debug.Log("Finished Spawining Rock");
     }
 
     /// <summary>
@@ -157,6 +187,16 @@ public class Spawner : MonoBehaviour {
         Instantiate(PlayerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
+    }
+
+    private void spawnBackground() {
+        GameObject newBack = (GameObject) Instantiate(BackgroundPrefab, new Vector3(0, nextBackgroundSpawnY), Quaternion.identity);
+        newBack.transform.parent = backgroundGameObject.transform;
+        newBack.transform.localPosition = new Vector3(0, nextBackgroundSpawnY);
+        newBack.transform.Rotate(new Vector3(0, 0, -90f));
+        newBack.transform.localScale = (new Vector3(1, 1, 1));
+
+        nextBackgroundSpawnY += 18;
     }
 
     /// <summary>
