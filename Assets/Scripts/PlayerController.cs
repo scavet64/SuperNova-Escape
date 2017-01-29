@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour {
     private bool isShipOnLeft;
     private int score;
     private bool isGameOver;
+    private GameController controller;
 
 
     // Use this for initialization
@@ -46,9 +47,10 @@ public class PlayerController : MonoBehaviour {
         losePanelAnimator = losePanel.GetComponent<Animator>();
         audioSource = this.gameObject.GetComponent<AudioSource>();
         backgroundAnimator = backgroundObject.GetComponent<Animator>();
+        controller = GameController.control;
 
         //distanceText = GetComponent<Text>();
-        score = 0;
+        this.score = 0;
         isGameOver = false;
         //animator.enabled = false;
 
@@ -90,7 +92,6 @@ public class PlayerController : MonoBehaviour {
             incrementScore();
             moveCamera();
             moveBackground();
-            
         }
     }
 
@@ -122,28 +123,30 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    //void OnCollisionEnter2D(Collision2D otherBox) {
-    //    Debug.Log("BOOM");
-    //    Debug.Log(transform.position);
+    /// <summary>
+    /// check to see if this score is better than previous and store data locally
+    /// </summary>
+    void collectAndStoreData() {
+        if (controller.bestDistance < score) {
+            //new Best!
+            controller.bestDistance = score;
+        }
+        controller.save();
+    }
 
-    //    //otherBox.rigidbody.AddExplosionForce(100f, this.transform.position, 4f);
-
-    //    AddExplosionForce(otherBox.rigidbody, 100, this.transform.position, 3f);
-
-    //    //trigger endgame
-    //    Instantiate(explosionPrefab, this.transform.position, Quaternion.identity);
-    //    triggerEndGame();
-    //}
-
+    /// <summary>
+    /// Trigger the endgame.
+    /// </summary>
     private void triggerEndGame() {
 
+        collectAndStoreData();
         showEndScreen();
         isGameOver = true;
 
         endScoreText.GetComponent<Text>().text = score.ToString();
 
         //TODO: NEED TO IMPLEMENT BEST
-        endScoreBest.GetComponent<Text>().text = "Error";
+        endScoreBest.GetComponent<Text>().text = controller.bestDistance.ToString();
 
         //hide player
         gameObject.SetActive(false);

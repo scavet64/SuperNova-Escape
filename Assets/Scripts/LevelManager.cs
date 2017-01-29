@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour {
 		if (autoLoadNextLevelAfter > 0) {
 			Invoke ("loadNextLevel", autoLoadNextLevelAfter);
 		}
+        Application.targetFrameRate = 60;
 	}
 
 	public void LoadLevel(string name){
