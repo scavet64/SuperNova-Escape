@@ -20,11 +20,11 @@ public class GameController : MonoBehaviour {
         if (control != null) {
             Destroy(gameObject);
         } else {
-            load();                                                     //load the players old information into datafields
+            load();                                                     	//load the players old information into datafields
             control = this;                                                 //put this object into the static control field
             GameObject.DontDestroyOnLoad(gameObject);                       //ensure this is the only instance of this game object
-            //adManager = AdvertManager.adManager;                            //store reference to singleton admanager
-            //audioSource.mute = isMuted;                                     //set the audiosource to its correct muted state
+            //adManager = AdvertManager.adManager;                          //store reference to singleton admanager
+            //audioSource.mute = isMuted;                                   //set the audiosource to its correct muted state
             timesPlayedToday = 0;                                           //initialize the number of plays this session to 0
                                                                             //Debug.Log (Application.persistentDataPath);
             QualitySettings.SetQualityLevel(lastUsedQualitySetting, true);  //set the quality setting using last quality setting
