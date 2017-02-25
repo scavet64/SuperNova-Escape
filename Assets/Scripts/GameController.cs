@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine.SocialPlatforms;
+using UnityEngine.SocialPlatforms.GameCenter;
 
 public class GameController : MonoBehaviour {
 
@@ -69,7 +70,7 @@ public class GameController : MonoBehaviour {
     }
 
     public void showLeaderboard() {
-        Social.ShowLeaderboardUI();
+        GameCenterPlatform.ShowLeaderboardUI("grp.7b8ac33ada8b4a748ef3cb7cc71377f6", TimeScope.AllTime);
     }
 
     public void save() {
