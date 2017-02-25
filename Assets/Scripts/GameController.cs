@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using UnityEngine.SocialPlatforms;
 
 public class GameController : MonoBehaviour {
 
@@ -30,6 +31,7 @@ public class GameController : MonoBehaviour {
             QualitySettings.SetQualityLevel(lastUsedQualitySetting, true);  //set the quality setting using last quality setting
                                                                             //unlockAllSkins ();
             Application.targetFrameRate = 60;
+            Social.localUser.Authenticate(ProcessAuthentication);
         }
     }
 
@@ -37,6 +39,38 @@ public class GameController : MonoBehaviour {
     void Update () {
 	
 	}
+
+    // This function gets called when Authenticate completes
+    // Note that if the operation is successful, Social.localUser will contain data from the server. 
+    void ProcessAuthentication(bool success) {
+        if (success) {
+            Debug.Log("Authenticated, checking achievements");
+
+            // Request loaded achievements, and register a callback for processing them
+            Social.LoadAchievements(ProcessLoadedAchievements);
+        } else
+            Debug.Log("Failed to authenticate");
+    }
+
+    // This function gets called when the LoadAchievement call completes
+    void ProcessLoadedAchievements(IAchievement[] achievements) {
+        if (achievements.Length == 0)
+            Debug.Log("Error: no achievements found");
+        else
+            Debug.Log("Got " + achievements.Length + " achievements");
+
+        // You can also call into the functions like this
+        Social.ReportProgress("Achievement01", 100.0, result => {
+            if (result)
+                Debug.Log("Successfully reported achievement progress");
+            else
+                Debug.Log("Failed to report achievement");
+        });
+    }
+
+    public void showLeaderboard() {
+        Social.ShowLeaderboardUI();
+    }
 
     public void save() {
         BinaryFormatter bf = new BinaryFormatter();
