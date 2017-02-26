@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour {
     private int score;
     private bool isGameOver;
     private GameController controller;
-    private readonly string leaderboardID = "grp.7b8ac33ada8b4a748ef3cb7cc71377f6";
 
 
     // Use this for initialization
@@ -157,16 +156,6 @@ public class PlayerController : MonoBehaviour {
         gameObject.SetActive(false);
 
     }
-
-    void PersistScoreToDatabase(int score) {
-        Social.ReportScore(score, leaderboardID, result => {
-            if (result)
-                Debug.Log("Successfully reported score");
-            else
-                Debug.Log("Failed to report score");
-        });
-    }
-
 
     public void incrementScore() {
         score++;
