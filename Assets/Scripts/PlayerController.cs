@@ -131,9 +131,9 @@ public class PlayerController : MonoBehaviour {
         if (controller.bestDistance < score) {
             //new Best!
             controller.bestDistance = score;
-            controller.PersistScoreToGamecenterDatabase(score);
-            controller.saveScoreToMyDatabase(score);
         }
+        controller.PersistScoreToGamecenterDatabase(score);
+        controller.saveScoreToMyDatabase(score);
         controller.save();
     }
 
