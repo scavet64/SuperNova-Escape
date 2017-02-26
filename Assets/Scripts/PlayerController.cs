@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SocialPlatforms;
 
 public class PlayerController : MonoBehaviour {
 
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour {
     private int score;
     private bool isGameOver;
     private GameController controller;
+    private readonly string leaderboardID = "grp.7b8ac33ada8b4a748ef3cb7cc71377f6";
 
 
     // Use this for initialization
@@ -130,6 +132,8 @@ public class PlayerController : MonoBehaviour {
         if (controller.bestDistance < score) {
             //new Best!
             controller.bestDistance = score;
+            controller.PersistScoreToGamecenterDatabase(score);
+            controller.saveScoreToMyDatabase(score);
         }
         controller.save();
     }
@@ -139,13 +143,14 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private void triggerEndGame() {
 
+        isGameOver = true;
         collectAndStoreData();
         showEndScreen();
-        isGameOver = true;
 
+        //display this score
         endScoreText.GetComponent<Text>().text = score.ToString();
 
-        //TODO: NEED TO IMPLEMENT BEST
+        //display the best score
         endScoreBest.GetComponent<Text>().text = controller.bestDistance.ToString();
 
         //hide player
@@ -153,10 +158,19 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    void PersistScoreToDatabase(int score) {
+        Social.ReportScore(score, leaderboardID, result => {
+            if (result)
+                Debug.Log("Successfully reported score");
+            else
+                Debug.Log("Failed to report score");
+        });
+    }
+
+
     public void incrementScore() {
         score++;
         distanceText.text = "Score: " + score;
-
     }
 
     private void showEndScreen() {
@@ -179,12 +193,7 @@ public class PlayerController : MonoBehaviour {
 
     private void playMoveAnimation(string animationName) {
         Debug.Log(animationName);
-        //Debug.Log(animator);
-        //playerAnimator.enabled = true;
         playerAnimator.Play(animationName);
-
-        //move camera up or world down
-
     }
 
 }

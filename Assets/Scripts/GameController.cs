@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using UnityEngine.SocialPlatforms;
+using UnityEngine.SocialPlatforms.GameCenter;
 
 public class GameController : MonoBehaviour {
 
@@ -12,6 +14,7 @@ public class GameController : MonoBehaviour {
     public float bestDistance { get; set; }             //players best distance traveled
     public bool isMuted { get; set; }                   //if the player has the game muted or not
     public int lastUsedQualitySetting { get; set; }		//best quality setting that was determined on initial launch
+    private readonly string leaderboardID = "grp.7b8ac33ada8b4a748ef3cb7cc71377f6";
 
     public int timesPlayedToday { get; set; }
 
@@ -30,6 +33,7 @@ public class GameController : MonoBehaviour {
             QualitySettings.SetQualityLevel(lastUsedQualitySetting, true);  //set the quality setting using last quality setting
                                                                             //unlockAllSkins ();
             Application.targetFrameRate = 60;
+            Social.localUser.Authenticate(ProcessAuthentication);
         }
     }
 
@@ -37,6 +41,62 @@ public class GameController : MonoBehaviour {
     void Update () {
 	
 	}
+
+    // This function gets called when Authenticate completes
+    // Note that if the operation is successful, Social.localUser will contain data from the server. 
+    void ProcessAuthentication(bool success) {
+        if (success) {
+            Debug.Log("Authenticated, checking achievements");
+
+            // Request loaded achievements, and register a callback for processing them
+            Social.LoadAchievements(ProcessLoadedAchievements);
+        } else
+            Debug.Log("Failed to authenticate");
+    }
+
+    // This function gets called when the LoadAchievement call completes
+    void ProcessLoadedAchievements(IAchievement[] achievements) {
+        if (achievements.Length == 0)
+            Debug.Log("Error: no achievements found");
+        else
+            Debug.Log("Got " + achievements.Length + " achievements");
+
+        // You can also call into the functions like this
+        Social.ReportProgress("Achievement01", 100.0, result => {
+            if (result)
+                Debug.Log("Successfully reported achievement progress");
+            else
+                Debug.Log("Failed to report achievement");
+        });
+    }
+
+    /// <summary>
+    /// This method displays the built in apple leaderboard for game center.
+    /// </summary>
+    public void showLeaderboard() {
+        GameCenterPlatform.ShowLeaderboardUI(leaderboardID, TimeScope.AllTime);
+    }
+
+    /// <summary>
+    /// Method will save the passed in score to my hosted database as a backup
+    /// </summary>
+    /// <param name="score">integer representing the players score</param>
+    public void saveScoreToMyDatabase(int score) {
+        //TODO: Implement method
+    }
+
+    /// <summary>
+    /// Persist the score to the game center database. This will be the primary method of persisting scores.
+    /// </summary>
+    /// <param name="score">integer representing the players score</param>
+    public void PersistScoreToGamecenterDatabase(int score) {
+        Social.ReportScore(score, leaderboardID, result => {
+            if (result)
+                Debug.Log("Successfully reported score");
+            else
+                Debug.Log("Failed to report score");
+        });
+    }
 
     public void save() {
         BinaryFormatter bf = new BinaryFormatter();

@@ -68,7 +68,7 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// List containing all of the spawned rocks
     /// </summary>
-    private List<GameObject> currentSpawnedRocks;
+    public static List<GameObject> currentSpawnedRocks { get; private set; }
 
     /// <summary>
     /// This counts the number of times the player has jumped. This is used to indicate when we should spawn another background image
