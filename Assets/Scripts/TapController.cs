@@ -15,10 +15,10 @@ public class TapController : MonoBehaviour {
         float firstRock = Spawner.currentSpawnedRocks[0].transform.position.x;
         if(firstRock < 0) {
             //rock is on left
-            this.transform.position += new Vector3(125, -175);
+            this.transform.position += new Vector3(270, -419);
         } else {
             //rock is on right
-            this.transform.position += new Vector3(-125, -175);
+            this.transform.position += new Vector3(-270, -419);
         }
 
         image.enabled = true;
