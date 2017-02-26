@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
 	public LevelManager instance;
+    private AsyncOperation async;
 	//public GameObject MenuScreen;
 
 	/// <summary>
@@ -21,22 +22,34 @@ public class LevelManager : MonoBehaviour {
 		else
 		{
 			instance = this;
-			DontDestroyOnLoad(gameObject); 
-		}
+			DontDestroyOnLoad(gameObject);
+            StartLoading();
+        }
 	}
 
-	/// <summary>
-	/// Load the level with the given name
-	/// </summary>
-	/// <param name="name">Name.</param>
-	public void LoadLevel(string name){
+    private void Update() {
+        if (async != null && async.isDone) {
+            async.allowSceneActivation = true;
+        }
+    }
+
+    public void StartLoading() {
+        StartCoroutine(LoadAsyncLevel("Menu"));
+    }
+
+    /// <summary>
+    /// Load the level with the given name
+    /// </summary>
+    /// <param name="name">Name.</param>
+    public void LoadLevel(string name){
 		Debug.Log ("New Level load: " + name);
         SceneManager.LoadSceneAsync(name);
 	}
 
     IEnumerator LoadAsyncLevel(string name) {
         Debug.Log("New Level load: " + name);
-        AsyncOperation async = SceneManager.LoadSceneAsync(name);
+        async = SceneManager.LoadSceneAsync(name);
+        async.allowSceneActivation = false;
         yield return async;
     }
 
