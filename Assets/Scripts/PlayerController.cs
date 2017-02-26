@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SocialPlatforms;
+using System;
 
 public class PlayerController : MonoBehaviour {
 
@@ -55,11 +56,25 @@ public class PlayerController : MonoBehaviour {
         isGameOver = false;
         //animator.enabled = false;
 
+        if (GameController.control.timesPlayedToday > 0) {
+            if (GameController.control.timesPlayedToday % 3 == 0) {
+                //time for a new banner
+                requestBanner();
+            }
+        } else {
+            //first time playing today
+            requestBanner();
+        }
+        GameController.control.timesPlayedToday++;
+
     }
-	
-	// Update is called once per frame
-	void Update () {
-        //Debug.Log("TEST");
+
+    void requestBanner() {
+        try {
+            AdvertManager.adManager.RequestBanner();
+        } catch (Exception e) {
+            Debug.Log(e.StackTrace);
+        }
     }
 
     public void moveShip(int i) {
@@ -97,7 +112,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void playMovementAudio() {
-        audioSource.clip = movementSounds[Random.Range(0, movementSounds.Length - 1)];
+        audioSource.clip = movementSounds[UnityEngine.Random.Range(0, movementSounds.Length - 1)];
         audioSource.Play();
     }
 
@@ -145,6 +160,7 @@ public class PlayerController : MonoBehaviour {
         isGameOver = true;
         collectAndStoreData();
         showEndScreen();
+        showInterstialIfNeeded();
 
         //display this score
         endScoreText.GetComponent<Text>().text = score.ToString();
@@ -155,6 +171,17 @@ public class PlayerController : MonoBehaviour {
         //hide player
         gameObject.SetActive(false);
 
+    }
+
+    private void showInterstialIfNeeded() {
+        Debug.Log(GameController.control.timesPlayedToday);
+        if (GameController.control.timesPlayedToday % 5 == 0) {
+            Debug.Log("Showing Interstitial");
+            Debug.Log(GameController.control.timesPlayedToday);
+            AdvertManager.adManager.showInterstitial();
+        } else if (GameController.control.timesPlayedToday % 5 == 1) {
+            AdvertManager.adManager.RequestInterstitial();
+        }
     }
 
     public void incrementScore() {
