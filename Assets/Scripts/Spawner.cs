@@ -16,6 +16,13 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     public GameObject[] AstroidPrefabs;
 
+    /// <summary>
+    /// Background prefab object
+    /// </summary>
+    public GameObject BackgroundPrefab;
+
+    public GameObject backgroundGameObject;
+
     /********** ^^ Set in Editor ^^ **********/
 
     /// <summary>
@@ -44,9 +51,14 @@ public class Spawner : MonoBehaviour {
     private const int obsticalZ = 0;
 
     /// <summary>
-    /// The current rock level for the player
+    /// The current y position for the current rock level
     /// </summary>
-    private float shipsCurrentRockLevel = 0;
+    private float shipsCurrentYRockLevel = 0;
+
+    /// <summary>
+    /// Current rock the player is on.
+    /// </summary>
+    private int shipsCurrentRockLevel;
 
     /// <summary>
     /// The number of rocks spawned at a single time.
@@ -56,7 +68,22 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// List containing all of the spawned rocks
     /// </summary>
-    private List<GameObject> currentSpawnedRocks;
+    public static List<GameObject> currentSpawnedRocks { get; private set; }
+
+    /// <summary>
+    /// This counts the number of times the player has jumped. This is used to indicate when we should spawn another background image
+    /// </summary>
+    private int timeSinceLastBackgroundSpawn = 249;
+
+    /// <summary>
+    /// This number represnets the number of jumps a player must make until a new background image is spawned.
+    /// </summary>
+    private int spawnBackgroundAfter = 250;
+
+    /// <summary>
+    /// The next Y position the new background image will have.
+    /// </summary>
+    private int nextBackgroundSpawnY = 18;
     
     /// <summary>
     /// Starts this game object
@@ -82,13 +109,24 @@ public class Spawner : MonoBehaviour {
     public void spawnRocksIfNeeded() {
         if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) {
             //need more rocks
-            Debug.Log(shipsCurrentRockLevel);
+            Debug.Log(shipsCurrentYRockLevel);
             Debug.Log(currentSpawnedRocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
             spawnBackgroundFlyingRock();
         }
-        shipsCurrentRockLevel += 2.5f;
+        shipsCurrentRockLevel++;
+        shipsCurrentYRockLevel += 2.5f;
         //spawnBackgroundFlyingRock();
+    }
+
+    public void spawnBackgroundIfNeeded() {
+        if(timeSinceLastBackgroundSpawn > spawnBackgroundAfter) {
+            spawnBackground();
+            timeSinceLastBackgroundSpawn = 0;
+        } else {
+            timeSinceLastBackgroundSpawn++;
+        }
+
     }
 
     /// <summary>
@@ -96,7 +134,7 @@ public class Spawner : MonoBehaviour {
     /// </summary>
     private void spawnBackgroundFlyingRock() {
         float backgroundLevel = Random.Range(1f, 10f);
-        float spawningY = Random.Range(shipsCurrentRockLevel + 4f, shipsCurrentRockLevel - 0f);
+        float spawningY = Random.Range(shipsCurrentYRockLevel + 4f, shipsCurrentYRockLevel - 0f);
         float spawningSide = getRandomBackgroundRockSide();
         GameObject randomAstroid = GetRandomAstroid();
 
@@ -106,8 +144,8 @@ public class Spawner : MonoBehaviour {
         rock.transform.localScale = GetRandomScale();
 
         //set darkness to simulate distance
-        float darknessScale = Random.Range(20f, 200f);
-        rock.GetComponent<SpriteRenderer>().color += new Color(darknessScale, darknessScale, darknessScale, 255f);
+        float darknessScale = Random.Range(0.4f, 0.8f);
+        rock.GetComponent<SpriteRenderer>().color = new Color(darknessScale, darknessScale, darknessScale, 1);
         Debug.Log(rock.GetComponent<SpriteRenderer>().color);
 
         //set velocity
@@ -117,7 +155,8 @@ public class Spawner : MonoBehaviour {
 
         //Disable collider
         rock.GetComponent<CircleCollider2D>().isTrigger = true;
-        rock.gameObject.tag = "";
+        rock.gameObject.tag = "Background";
+        Debug.Log("Finished Spawning Rock");
     }
 
     /// <summary>
@@ -157,6 +196,19 @@ public class Spawner : MonoBehaviour {
         Instantiate(PlayerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
+    }
+
+    /// <summary>
+    /// Spawn a new background image and add it to the parent game object.
+    /// </summary>
+    private void spawnBackground() {
+        GameObject newBack = (GameObject) Instantiate(BackgroundPrefab, new Vector3(0, nextBackgroundSpawnY), Quaternion.identity);
+        newBack.transform.parent = backgroundGameObject.transform;
+        newBack.transform.localPosition = new Vector3(0, nextBackgroundSpawnY);
+        newBack.transform.Rotate(new Vector3(0, 0, -90f));
+        newBack.transform.localScale = (new Vector3(1, 1, 1));
+
+        nextBackgroundSpawnY += 18;
     }
 
     /// <summary>

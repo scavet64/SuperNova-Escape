@@ -4,7 +4,7 @@ using System.Collections;
 public class SuperNovaController : MonoBehaviour {
 
     private float currentSpeed;
-    private float maxSpeed = 9;
+    private float maxSpeed = 10;
     public Transform target;
     public float smoothTime = -100000000000000000000000000000000.3F;
     private Vector3 velocity = Vector3.zero;
