@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
-	public LevelManager instance;
+	public static LevelManager instance { get; set; }
     private AsyncOperation async;
 	//public GameObject MenuScreen;
 
@@ -28,13 +28,17 @@ public class LevelManager : MonoBehaviour {
 	}
 
     private void Update() {
-        if (async != null && async.isDone) {
+        if (async != null && async.progress >= 0.9f) {
             async.allowSceneActivation = true;
         }
     }
 
     public void StartLoading() {
-        StartCoroutine(LoadAsyncLevel("Menu"));
+        StartLoading("Menu");
+    }
+
+    public void StartLoading(string name) {
+        StartCoroutine(LoadAsyncLevel(name));
     }
 
     /// <summary>
