@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour {
     public float bestDistance { get; set; }             //players best distance traveled
     public bool isMuted { get; set; }                   //if the player has the game muted or not
     public int lastUsedQualitySetting { get; set; }		//best quality setting that was determined on initial launch
-    private readonly string leaderboardID = "7b8ac33ada8b4a748ef3cb7cc71377f6";
+    private static readonly string leaderboardID = "7b8ac33ada8b4a748ef3cb7cc71377f6";
 
     public int timesPlayedToday { get; set; }
 
@@ -73,7 +73,7 @@ public class GameController : MonoBehaviour {
     /// <summary>
     /// This method displays the built in apple leaderboard for game center.
     /// </summary>
-    public void showLeaderboard() {
+    public static void showLeaderboard() {
         GameCenterPlatform.ShowLeaderboardUI(leaderboardID, TimeScope.AllTime);
     }
 
