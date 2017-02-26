@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
     public float bestDistance { get; set; }             //players best distance traveled
     public bool isMuted { get; set; }                   //if the player has the game muted or not
     public int lastUsedQualitySetting { get; set; }		//best quality setting that was determined on initial launch
+    private readonly string leaderboardID = "grp.7b8ac33ada8b4a748ef3cb7cc71377f6";
 
     public int timesPlayedToday { get; set; }
 
@@ -69,8 +70,32 @@ public class GameController : MonoBehaviour {
         });
     }
 
+    /// <summary>
+    /// This method displays the built in apple leaderboard for game center.
+    /// </summary>
     public void showLeaderboard() {
-        GameCenterPlatform.ShowLeaderboardUI("grp.7b8ac33ada8b4a748ef3cb7cc71377f6", TimeScope.AllTime);
+        GameCenterPlatform.ShowLeaderboardUI(leaderboardID, TimeScope.AllTime);
+    }
+
+    /// <summary>
+    /// Method will save the passed in score to my hosted database as a backup
+    /// </summary>
+    /// <param name="score">integer representing the players score</param>
+    public void saveScoreToMyDatabase(int score) {
+        //TODO: Implement method
+    }
+
+    /// <summary>
+    /// Persist the score to the game center database. This will be the primary method of persisting scores.
+    /// </summary>
+    /// <param name="score">integer representing the players score</param>
+    public void PersistScoreToGamecenterDatabase(int score) {
+        Social.ReportScore(score, leaderboardID, result => {
+            if (result)
+                Debug.Log("Successfully reported score");
+            else
+                Debug.Log("Failed to report score");
+        });
     }
 
     public void save() {

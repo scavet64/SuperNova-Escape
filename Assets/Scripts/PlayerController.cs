@@ -132,7 +132,8 @@ public class PlayerController : MonoBehaviour {
         if (controller.bestDistance < score) {
             //new Best!
             controller.bestDistance = score;
-            PersistScoreToDatabase(score);
+            controller.PersistScoreToGamecenterDatabase(score);
+            controller.saveScoreToMyDatabase(score);
         }
         controller.save();
     }
@@ -142,13 +143,14 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private void triggerEndGame() {
 
+        isGameOver = true;
         collectAndStoreData();
         showEndScreen();
-        isGameOver = true;
 
+        //display this score
         endScoreText.GetComponent<Text>().text = score.ToString();
 
-        //TODO: NEED TO IMPLEMENT BEST
+        //display the best score
         endScoreBest.GetComponent<Text>().text = controller.bestDistance.ToString();
 
         //hide player
@@ -169,7 +171,6 @@ public class PlayerController : MonoBehaviour {
     public void incrementScore() {
         score++;
         distanceText.text = "Score: " + score;
-
     }
 
     private void showEndScreen() {
@@ -192,12 +193,7 @@ public class PlayerController : MonoBehaviour {
 
     private void playMoveAnimation(string animationName) {
         Debug.Log(animationName);
-        //Debug.Log(animator);
-        //playerAnimator.enabled = true;
         playerAnimator.Play(animationName);
-
-        //move camera up or world down
-
     }
 
 }
