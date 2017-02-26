@@ -5,9 +5,7 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
 	public LevelManager instance;
-	public GameObject MenuScreen;
-
-	public float autoLoadNextLevelAfter;
+	//public GameObject MenuScreen;
 
 	/// <summary>
 	/// This is the main method that instantiates the Level Manager class
@@ -33,8 +31,14 @@ public class LevelManager : MonoBehaviour {
 	/// <param name="name">Name.</param>
 	public void LoadLevel(string name){
 		Debug.Log ("New Level load: " + name);
-		Application.LoadLevel (name);
+        SceneManager.LoadSceneAsync(name);
 	}
+
+    IEnumerator LoadAsyncLevel(string name) {
+        Debug.Log("New Level load: " + name);
+        AsyncOperation async = SceneManager.LoadSceneAsync(name);
+        yield return async;
+    }
 
 	/// <summary>
 	/// Loads the main game.
@@ -42,7 +46,7 @@ public class LevelManager : MonoBehaviour {
 	public void LoadMainGame()
 	{
 		SceneManager.LoadSceneAsync("01Level");
-		MenuScreen.active = false;
+		//MenuScreen.active = false;
 	}
 
 	/// <summary>
@@ -51,13 +55,6 @@ public class LevelManager : MonoBehaviour {
 	public void QuitRequest(){
 		Debug.Log ("Quit requested");
 		Application.Quit ();
-	}
-
-	/// <summary>
-	/// Loads the next level.
-	/// </summary>
-	public void loadNextLevel(){
-		Application.LoadLevel (Application.loadedLevel + 1);
 	}
 
 }
