@@ -12,7 +12,7 @@ public class AdvertManager : MonoBehaviour {
     private InterstitialAd interstitial;
     private static string outputMessage = "";
     private bool testingApp = false;
-    private string iosBannerAdID = "ca-app-pub-6333353846841342~4669157315";
+    private string iosBannerAdID = "ca-app-pub-6333353846841342/6145890514";
     private string iosIntersitialAdID = "ca-app-pub-6333353846841342/7622623717";
 
     void Awake() {
