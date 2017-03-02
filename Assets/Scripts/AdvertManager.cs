@@ -6,15 +6,29 @@ using GoogleMobileAds.Api;
 
 public class AdvertManager : MonoBehaviour {
 
+	/// <summary>
+	/// Singlton instance.
+	/// </summary>
     public static AdvertManager adManager;
 
     private BannerView bannerView;
     private InterstitialAd interstitial;
     private static string outputMessage = "";
-    private bool testingApp = false;
+
+	/// <summary>
+	/// The ios ad identifiers. Set these using the ids from AdMob
+	/// </summary>
     private string iosBannerAdID = "ca-app-pub-6333353846841342/6145890514";
     private string iosIntersitialAdID = "ca-app-pub-6333353846841342/7622623717";
 
+	/// <summary>
+	/// The position you want the ad to appear.
+	/// </summary>
+	private AdPosition adPosition = AdPosition.Bottom;
+
+	/// <summary>
+	/// Method runs when this game object is awoken.
+	/// </summary>
     void Awake() {
         if (adManager != null) {
             Destroy(gameObject);
@@ -24,6 +38,9 @@ public class AdvertManager : MonoBehaviour {
         }
     }
 
+	/// <summary>
+	/// Requests the banner. This method will show the ad when ready.
+	/// </summary>
     public void RequestBanner() {
 #if UNITY_EDITOR
         string adUnitId = "unused";
@@ -36,7 +53,7 @@ public class AdvertManager : MonoBehaviour {
 #endif
 
         // Create a 320x50 banner at the bottom of the screen.
-        bannerView = new BannerView(adUnitId, AdSize.SmartBanner, AdPosition.Bottom);
+        bannerView = new BannerView(adUnitId, AdSize.SmartBanner, adPosition);
         // Register for ad events.
         bannerView.OnAdLoaded += HandleAdLoaded;
         bannerView.OnAdFailedToLoad += HandleAdFailedToLoad;
@@ -48,10 +65,16 @@ public class AdvertManager : MonoBehaviour {
         bannerView.Show();
     }
 
+	/// <summary>
+	/// Destories the banner.
+	/// </summary>
     public void destoryBanner() {
         bannerView.Destroy();
     }
 
+	/// <summary>
+	/// Requests the interstitial. Does not show the ad.
+	/// </summary>
     public void RequestInterstitial() {
 #if UNITY_EDITOR
         string adUnitId = "unused";
@@ -73,41 +96,19 @@ public class AdvertManager : MonoBehaviour {
         interstitial.OnAdLeavingApplication += HandleInterstitialLeftApplication;
         // Load an interstitial ad.
         interstitial.LoadAd(createAdRequest());
-        //interstitial.Show ();
     }
 
+	/// <summary>
+	/// Shows the interstitial.
+	/// </summary>
     public void showInterstitial() {
         interstitial.Show();
     }
 
-    private AdRequest createAdRequest() {
-        //		if (testingApp) {
-        //			Debug.Log ("TESTAD");
-        //			return new AdRequest.Builder()
-        //			.AddTestDevice(AdRequest.TestDeviceSimulator)
-        //			.AddTestDevice("0123456789ABCDEF0123456789ABCDEF")
-        //			.AddKeyword("game")
-        //			.SetGender(Gender.Male)
-        //			.SetBirthday(new DateTime(1999, 1, 1))
-        //			.TagForChildDirectedTreatment(false)
-        //			.AddExtra("color_bg", "9B30FF")
-        //			.Build();
-        //		} else {
-        return new AdRequest.Builder().Build();
-        //		}
-    }
-
-    //	private AdRequest createTestAdRequest(){
-    //		return new AdRequest.Builder()
-    //		.AddTestDevice(AdRequest.TestDeviceSimulator)
-    //		.AddTestDevice("0123456789ABCDEF0123456789ABCDEF")
-    //		.AddKeyword("game")
-    //		.SetGender(Gender.Male)
-    //		.SetBirthday(new DateTime(1999, 1, 1))
-    //		.TagForChildDirectedTreatment(false)
-    //		.AddExtra("color_bg", "9B30FF")
-    //		.Build();
-    //	}
+	private AdRequest createAdRequest()
+	{
+		return new AdRequest.Builder().Build();
+	}
 
     #region Banner callback handlers
 
