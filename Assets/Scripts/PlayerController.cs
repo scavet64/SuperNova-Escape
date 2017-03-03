@@ -106,9 +106,14 @@ public class PlayerController : MonoBehaviour {
             rockSpawner.spawnRocksIfNeeded();
             rockSpawner.spawnBackgroundIfNeeded();
             incrementScore();
+            checkAchievements();
             moveCamera();
             moveBackground();
         }
+    }
+
+    void checkAchievements() {
+
     }
 
     private void playMovementAudio() {
@@ -147,9 +152,20 @@ public class PlayerController : MonoBehaviour {
             //new Best!
             controller.bestDistance = score;
         }
-        controller.PersistScoreToGamecenterDatabase(score);
-        controller.saveScoreToMyDatabase(score);
+        GameCenterController.PersistScoreToGamecenterDatabase(score);
+        GameCenterController.saveScoreToMyDatabase(score);
         controller.save();
+    }
+
+    void reportAchievementProgress() {
+            GameCenterController.reportProgressForAchievement("25Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 25);
+            GameCenterController.reportProgressForAchievement("50Jumps.0b812bd06d1f430a8d1467323a43b443", score / 50);
+            GameCenterController.reportProgressForAchievement("75Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 75);
+            GameCenterController.reportProgressForAchievement("100Jumps.ce2f2d3b2eb144eb8dfa404a625a945e", score / 100);
+            GameCenterController.reportProgressForAchievement("150Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 150);
+            GameCenterController.reportProgressForAchievement("200Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 200);
+            GameCenterController.reportProgressForAchievement("300Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 300);
+            GameCenterController.reportProgressForAchievement("500Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 500);
     }
 
     /// <summary>
@@ -159,6 +175,7 @@ public class PlayerController : MonoBehaviour {
 
         isGameOver = true;
         collectAndStoreData();
+        reportAchievementProgress();
         showEndScreen();
         showInterstialIfNeeded();
 

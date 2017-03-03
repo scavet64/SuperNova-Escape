@@ -13,6 +13,10 @@ public class ButtonController : MonoBehaviour {
 
 	public void showLeaderboards()
 	{
-		GameController.showLeaderboard();
+        GameCenterController.showLeaderboard();
 	}
+
+    public void ShowAchievements() {
+        GameCenterController.ShowAchievements();
+    }
 }
