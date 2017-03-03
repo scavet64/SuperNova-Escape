@@ -78,6 +78,13 @@ public class GameController : MonoBehaviour {
     }
 
     /// <summary>
+    /// shows the achievementUI
+    /// </summary>
+    public static void ShowAchievements() {
+        Social.ShowAchievementsUI();
+    }
+
+    /// <summary>
     /// Method will save the passed in score to my hosted database as a backup
     /// </summary>
     /// <param name="score">integer representing the players score</param>

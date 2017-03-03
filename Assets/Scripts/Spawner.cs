@@ -88,42 +88,58 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Starts this game object
     /// </summary>
-	void Start () {
-
+	void Start () 
+    {
         currentSpawnedRocks = new List<GameObject>();
-
-        //spawnPlayer();
         spawnRocks(rocksSpawnedAtOnce);
-	}
-	
-    /// <summary>
-    /// Updates every frame
-    /// </summary>
-	void Update () {
-	
 	}
 
     /// <summary>
     /// Spawns rocks if they are needed
     /// </summary>
-    public void spawnRocksIfNeeded() {
-        if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) {
+    public void spawnRocksIfNeeded() 
+    {
+        if (shipsCurrentRockLevel + 5 > currentSpawnedRocks.Count) 
+        {
             //need more rocks
             Debug.Log(shipsCurrentYRockLevel);
             Debug.Log(currentSpawnedRocks.Count);
             spawnRocks(rocksSpawnedAtOnce);
-            spawnBackgroundFlyingRock();
         }
+
+        if(shipsCurrentRockLevel % 3 == 0) 
+        {
+            spawnMultipleBackgroundRocks(1);
+        }
+
         shipsCurrentRockLevel++;
         shipsCurrentYRockLevel += 2.5f;
-        //spawnBackgroundFlyingRock();
     }
 
-    public void spawnBackgroundIfNeeded() {
-        if(timeSinceLastBackgroundSpawn > spawnBackgroundAfter) {
+    /// <summary>
+    /// Spawns multiple rocks
+    /// </summary>
+    /// <param name="numberOfRocks">How many rocks to spawn</param>
+    private void spawnMultipleBackgroundRocks(int numberOfRocks)
+    {
+        for(int i = 0; i < numberOfRocks; i++) 
+        {
+            spawnBackgroundFlyingRock();
+        }
+    }
+
+    /// <summary>
+    /// Spawns a background rock if needed.
+    /// </summary>
+    public void spawnBackgroundIfNeeded() 
+    {
+        if(timeSinceLastBackgroundSpawn > spawnBackgroundAfter) 
+        {
             spawnBackground();
             timeSinceLastBackgroundSpawn = 0;
-        } else {
+        } 
+        else 
+        {
             timeSinceLastBackgroundSpawn++;
         }
 
@@ -132,9 +148,10 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawn flying rocks in the background.
     /// </summary>
-    private void spawnBackgroundFlyingRock() {
+    private void spawnBackgroundFlyingRock() 
+    {
         float backgroundLevel = Random.Range(1f, 10f);
-        float spawningY = Random.Range(shipsCurrentYRockLevel + 4f, shipsCurrentYRockLevel - 0f);
+        float spawningY = Random.Range(shipsCurrentYRockLevel + 15f, shipsCurrentYRockLevel - 0f);
         float spawningSide = getRandomBackgroundRockSide();
         GameObject randomAstroid = GetRandomAstroid();
 
@@ -151,7 +168,7 @@ public class Spawner : MonoBehaviour {
         //set velocity
         Rigidbody2D rockRigidBody = rock.GetComponent<Rigidbody2D>();
         rockRigidBody.isKinematic = false;  //Cannot be Kinematic 
-        rockRigidBody.velocity = GetRandomVelocity();
+        rockRigidBody.velocity = GetRandomVelocity(spawningSide);
 
         //Disable collider
         rock.GetComponent<CircleCollider2D>().isTrigger = true;
@@ -182,9 +199,12 @@ public class Spawner : MonoBehaviour {
     /// Returns a Vector3 with random X and Y values that should be used for velocity
     /// </summary>
     /// <returns>Vector3 with random X and Y values</returns>
-    private Vector3 GetRandomVelocity()
+    private Vector3 GetRandomVelocity(float spawingSide)
     {
-        float ranx = Random.Range(-5f, 5f);
+        float ranx = Random.Range(0.5f, 5f);
+        if (spawingSide > 0) {
+            ranx *= -1;
+        }
         float rany = Random.Range(-5f, 5f);
         return new Vector3(ranx, rany);
     }
@@ -192,7 +212,8 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawn the player on a random side
     /// </summary>
-    private void spawnPlayer() {
+    private void spawnPlayer() 
+    {
         Instantiate(PlayerPrefab, new Vector3(getRandomFixedSide(), currenty), Quaternion.identity);
         currenty += 2.5f;
         spawnRocks(1);
@@ -201,7 +222,8 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawn a new background image and add it to the parent game object.
     /// </summary>
-    private void spawnBackground() {
+    private void spawnBackground() 
+    {
         GameObject newBack = (GameObject) Instantiate(BackgroundPrefab, new Vector3(0, nextBackgroundSpawnY), Quaternion.identity);
         newBack.transform.parent = backgroundGameObject.transform;
         newBack.transform.localPosition = new Vector3(0, nextBackgroundSpawnY);
@@ -215,10 +237,11 @@ public class Spawner : MonoBehaviour {
     /// spawn a rock the passed in number of times. This method spawns a random astroid
     /// </summary>
     /// <param name="iterations">Number of rocks to spawn</param>
-    private void spawnRocks(int iterations) {
+    private void spawnRocks(int iterations) 
+    {
 
-        for (int i = 0; i < iterations; i++) {
-
+        for (int i = 0; i < iterations; i++) 
+        {
             currentSpawnedRocks.Add((GameObject)  Instantiate(GetRandomAstroid(), new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
             currenty += 2.5f;
         }
@@ -252,11 +275,11 @@ public class Spawner : MonoBehaviour {
         //randomly choose left or right
         if (Random.value > 0.5)
         {
-            randSideX = LEFTSIDEX - 3f;
+            randSideX = LEFTSIDEX - 5f;
         }
         else
         {
-            randSideX = RIGHTSIDEX + 3f;
+            randSideX = RIGHTSIDEX + 5f;
         }
         return randSideX;
     }
