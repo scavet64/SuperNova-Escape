@@ -158,7 +158,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     void reportAchievementProgress() {
-            GameCenterController.reportProgressForAchievement("grp.25Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 25);
+
+			GameCenterController.reportProgressForAchievement("grp.25Jumps.05acfb57f71b4a58bf29632aadbbaaf", score / 25);
             GameCenterController.reportProgressForAchievement("grp.50Jumps.0b812bd06d1f430a8d1467323a43b443", score / 50);
             GameCenterController.reportProgressForAchievement("grp.75Jumps.05acfb57f71b4a58bf29632aadbbaaf7", score / 75);
             GameCenterController.reportProgressForAchievement("grp.100Jumps.ce2f2d3b2eb144eb8dfa404a625a945e", score / 100);
