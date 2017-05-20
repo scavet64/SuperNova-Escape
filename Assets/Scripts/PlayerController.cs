@@ -51,20 +51,9 @@ public class PlayerController : MonoBehaviour {
         backgroundAnimator = backgroundObject.GetComponent<Animator>();
         controller = GameController.control;
 
-        //distanceText = GetComponent<Text>();
         this.score = 0;
         isGameOver = false;
-        //animator.enabled = false;
-
-        if (GameController.control.timesPlayedToday > 0) {
-            if (GameController.control.timesPlayedToday % 3 == 0) {
-                //time for a new banner
-                requestBanner();
-            }
-        } else {
-            //first time playing today
-            requestBanner();
-        }
+        requestBanner();
         GameController.control.timesPlayedToday++;
 
     }
@@ -106,14 +95,9 @@ public class PlayerController : MonoBehaviour {
             rockSpawner.spawnRocksIfNeeded();
             rockSpawner.spawnBackgroundIfNeeded();
             incrementScore();
-            checkAchievements();
             moveCamera();
             moveBackground();
         }
-    }
-
-    void checkAchievements() {
-
     }
 
     private void playMovementAudio() {
@@ -193,11 +177,11 @@ public class PlayerController : MonoBehaviour {
 
     private void showInterstialIfNeeded() {
         Debug.Log(GameController.control.timesPlayedToday);
-        if (GameController.control.timesPlayedToday % 5 == 0) {
+        if (GameController.control.timesPlayedToday % 3 == 0) {
             Debug.Log("Showing Interstitial");
             Debug.Log(GameController.control.timesPlayedToday);
             AdvertManager.adManager.showInterstitial();
-        } else if (GameController.control.timesPlayedToday % 5 == 1) {
+        } else if (GameController.control.timesPlayedToday % 3 == 1) {
             AdvertManager.adManager.RequestInterstitial();
         }
     }
