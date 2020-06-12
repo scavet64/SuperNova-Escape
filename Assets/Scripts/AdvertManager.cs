@@ -47,7 +47,7 @@ public class AdvertManager : MonoBehaviour {
 #elif UNITY_ANDROID
 			string adUnitId = iosBannerAdID;
 #elif UNITY_IPHONE
-			string adUnitId = "ca-app-pub-6333353846841342/5385634111";
+			string adUnitId = iosBannerAdID;
 #else
 			string adUnitId = "unexpected_platform";
 #endif
@@ -81,7 +81,7 @@ public class AdvertManager : MonoBehaviour {
 #elif UNITY_ANDROID
 		string adUnitId = iosIntersitialAdID;
 #elif UNITY_IPHONE
-		string adUnitId = "ca-app-pub-6333353846841342/8339100514";
+		string adUnitId = iosIntersitialAdID;
 #else
 		string adUnitId = "unexpected_platform";
 #endif

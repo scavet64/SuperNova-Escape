@@ -6,7 +6,7 @@ using UnityEngine.SocialPlatforms.GameCenter;
 
 public class GameCenterController : MonoBehaviour {
 
-    private static readonly string leaderboardID = "7b8ac33ada8b4a748ef3cb7cc71377f6";
+    private static readonly string leaderboardID = "grp.7b8ac33ada8b4a748ef3cb7cc71377f6";
 
     // Use this for initialization
     void Start () {
