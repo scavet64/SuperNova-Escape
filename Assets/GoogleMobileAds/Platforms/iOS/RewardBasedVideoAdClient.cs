@@ -1,3 +1,4 @@
+#if UNITY_IOS
 // Copyright (C) 2015 Google, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_IOS
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -24,7 +23,7 @@ using GoogleMobileAds.Common;
 
 namespace GoogleMobileAds.iOS
 {
-    internal class RewardBasedVideoAdClient : IRewardBasedVideoAdClient, IDisposable
+    public class RewardBasedVideoAdClient : IRewardBasedVideoAdClient, IDisposable
     {
         private IntPtr rewardBasedVideoAdPtr;
         private IntPtr rewardBasedVideoAdClientPtr;
@@ -52,6 +51,9 @@ namespace GoogleMobileAds.iOS
         internal delegate void GADURewardBasedVideoAdWillLeaveApplicationCallback(
             IntPtr rewardBasedVideoAdClient);
 
+        internal delegate void GADURewardBasedVideoAdDidCompleteCallback(
+            IntPtr rewardBasedVideoAdClient);
+
         #endregion
 
         public event EventHandler<EventArgs> OnAdLoaded;
@@ -67,6 +69,8 @@ namespace GoogleMobileAds.iOS
         public event EventHandler<Reward> OnAdRewarded;
 
         public event EventHandler<EventArgs> OnAdLeavingApplication;
+
+        public event EventHandler<EventArgs> OnAdCompleted;
 
         // This property should be used when setting the rewardBasedVideoPtr.
         private IntPtr RewardBasedVideoAdPtr
@@ -97,7 +101,8 @@ namespace GoogleMobileAds.iOS
                 RewardBasedVideoAdDidStartCallback,
                 RewardBasedVideoAdDidCloseCallback,
                 RewardBasedVideoAdDidRewardUserCallback,
-                RewardBasedVideoAdWillLeaveApplicationCallback);
+                RewardBasedVideoAdWillLeaveApplicationCallback,
+                RewardBasedVideoAdDidCompleteCallback);
         }
 
         // Load an ad.
@@ -115,9 +120,22 @@ namespace GoogleMobileAds.iOS
             Externs.GADUShowRewardBasedVideoAd(this.RewardBasedVideoAdPtr);
         }
 
+        // Sets the user ID to be used in server-to-server reward callbacks.
+        public void SetUserId(string userId)
+        {
+            Externs.GADUSetRewardBasedVideoAdUserId(this.RewardBasedVideoAdPtr, userId);
+        }
+
         public bool IsLoaded()
         {
             return Externs.GADURewardBasedVideoAdReady(this.RewardBasedVideoAdPtr);
+        }
+
+        // Returns the mediation adapter class name.
+        public string MediationAdapterClassName()
+        {
+            return Utils.PtrToString(
+                Externs.GADUMediationAdapterClassNameForRewardedVideo(this.RewardBasedVideoAdPtr));
         }
 
         // Destroys the rewarded video ad.
@@ -230,6 +248,18 @@ namespace GoogleMobileAds.iOS
             }
         }
 
+        [MonoPInvokeCallback(typeof(GADURewardBasedVideoAdDidCompleteCallback))]
+        private static void RewardBasedVideoAdDidCompleteCallback(
+            IntPtr rewardBasedVideoAdClient)
+        {
+            RewardBasedVideoAdClient client = IntPtrToRewardBasedVideoClient(
+                rewardBasedVideoAdClient);
+            if (client.OnAdCompleted != null)
+            {
+                client.OnAdCompleted(client, EventArgs.Empty);
+            }
+        }
+
         private static RewardBasedVideoAdClient IntPtrToRewardBasedVideoClient(
             IntPtr rewardBasedVideoAdClient)
         {
@@ -240,5 +270,6 @@ namespace GoogleMobileAds.iOS
         #endregion
     }
 }
-
 #endif
+
+

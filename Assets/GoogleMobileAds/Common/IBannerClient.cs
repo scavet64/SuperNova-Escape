@@ -17,7 +17,7 @@ using System;
 using GoogleMobileAds.Api;
 
 namespace GoogleMobileAds.Common {
-    internal interface IBannerClient
+    public interface IBannerClient
     {
         // Ad event fired when the banner ad has been received.
         event EventHandler<EventArgs> OnAdLoaded;
@@ -29,6 +29,8 @@ namespace GoogleMobileAds.Common {
         event EventHandler<EventArgs> OnAdClosed;
         // Ad event fired when the banner ad is leaving the application.
         event EventHandler<EventArgs> OnAdLeavingApplication;
+        // Ad event fired when the banner ad is estimated to have earned money.
+        event EventHandler<AdValueEventArgs> OnPaidEvent;
 
         // Creates a banner view and adds it to the view hierarchy.
         void CreateBannerView(string adUnitId, AdSize adSize, AdPosition position);
@@ -47,5 +49,20 @@ namespace GoogleMobileAds.Common {
 
         // Destroys a banner view.
         void DestroyBannerView();
+
+        // Returns the height of the BannerView in pixels.
+        float GetHeightInPixels();
+
+        // Returns the width of the BannerView in pixels.
+        float GetWidthInPixels();
+
+      // Set the position of the banner view using standard position.
+        void SetPosition(AdPosition adPosition);
+
+        // Set the position of the banner view using custom position.
+        void SetPosition(int x, int y);
+
+        // Returns the mediation adapter class name.
+        string MediationAdapterClassName();
     }
 }

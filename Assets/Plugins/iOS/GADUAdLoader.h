@@ -1,7 +1,8 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 
-@import Foundation;
-@import GoogleMobileAds;
+#import <Foundation/Foundation.h>
+
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 #import "GADUTypes.h"
 
@@ -19,9 +20,9 @@
 /// List of templateIDs.
 @property(nonatomic, copy) NSArray *templateIDs;
 
-/// The ad received callback into Unity.
+/// The custom template ad received callback into Unity.
 @property(nonatomic, assign)
-    GADUAdLoaderDidReceiveNativeCustomTemplateAdCallback adReceivedCallback;
+    GADUAdLoaderDidReceiveNativeCustomTemplateAdCallback customTemplateAdReceivedCallback;
 
 /// The ad failed to load callback into Unity.
 @property(nonatomic, assign) GADUAdLoaderDidFailToReceiveAdWithErrorCallback adFailedCallback;
@@ -30,7 +31,8 @@
 - (instancetype)initWithAdLoaderClientReference:(GADUTypeAdLoaderClientRef *)adLoaderClient
                                        adUnitID:(NSString *)adUnitID
                                     templateIDs:(NSArray *)templateIDs
-                                        adTypes:(NSArray *)adTypes;
+                                        adTypes:(NSArray *)adTypes
+                                        options:(NSArray *)options;
 
 /// Makes an ad request. Additional targeting options can be supplied with a request object.
 - (void)loadRequest:(GADRequest *)request;

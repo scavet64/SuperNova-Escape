@@ -17,7 +17,7 @@ using System;
 using GoogleMobileAds.Api;
 
 namespace GoogleMobileAds.Common {
-    internal interface IInterstitialClient
+    public interface IInterstitialClient
     {
         // Ad event fired when the interstitial ad has been received.
         event EventHandler<EventArgs> OnAdLoaded;
@@ -29,6 +29,9 @@ namespace GoogleMobileAds.Common {
         event EventHandler<EventArgs> OnAdClosed;
         // Ad event fired when the interstitial ad is leaving the application.
         event EventHandler<EventArgs> OnAdLeavingApplication;
+        // Ad event fired when the interstitial ad is estimated to have earned money.
+        event EventHandler<AdValueEventArgs> OnPaidEvent;
+
 
         // Creates an InterstitialAd.
         void CreateInterstitialAd(string adUnitId);
@@ -45,10 +48,7 @@ namespace GoogleMobileAds.Common {
         // Destroys an InterstitialAd.
         void DestroyInterstitial();
 
-        // Sets processor for default purchase flow.
-        void SetDefaultInAppPurchaseProcessor(IDefaultInAppPurchaseProcessor processor);
-
-        // Sets processor for custom purchase flow.
-        void SetCustomInAppPurchaseProcessor(ICustomInAppPurchaseProcessor processor);
+        // Returns the mediation adapter class name.
+        string MediationAdapterClassName();
     }
 }

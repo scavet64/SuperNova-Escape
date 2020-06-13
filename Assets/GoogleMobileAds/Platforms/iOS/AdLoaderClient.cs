@@ -1,3 +1,4 @@
+#if UNITY_IOS
 // Copyright (C) 2016 Google, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,53 +13,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_IOS
-
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Common;
-using UnityEngine;
 
 namespace GoogleMobileAds.iOS
 {
+    [StructLayout(LayoutKind.Sequential),Serializable]
+    // The System.Boolean (bool in C#) type is special. A bool within a structure is marshaled in a different format
+    // than when passed as an argument to a function (4-byte integer vs 2-byte integer, non zero = true vs -1 = true).
+    // Using ints instead for simplicity.
     public struct NativeAdTypes
     {
-        public bool CustomTemplateAd;
-        public bool AppInstallAd;
-        public bool ContentAd;
+        public int CustomTemplateAd;
     }
 
-    internal class AdLoaderClient : IAdLoaderClient, IDisposable
+    public class AdLoaderClient : IAdLoaderClient, IDisposable
     {
         private IntPtr adLoaderPtr;
         private IntPtr adLoaderClientPtr;
+        private NativeAdTypes adTypes;
+        // Dictionary of template Ids and whether they have a click callback registered.
+        Dictionary<string, bool> TemplateIds;
 
-        private Dictionary<string, Action<CustomNativeTemplateAd, string>>
-            customNativeTemplateCallbacks;
-
-        public AdLoaderClient(AdLoader unityAdLoader)
+        public AdLoaderClient(AdLoaderClientArgs clientArgs)
         {
             this.adLoaderClientPtr = (IntPtr)GCHandle.Alloc(this);
+            this.TemplateIds = clientArgs.TemplateIds;
+            string[] templateIdsArray = new string[TemplateIds.Keys.Count];
+            TemplateIds.Keys.ToList().CopyTo(templateIdsArray);
 
-            this.customNativeTemplateCallbacks = unityAdLoader.CustomNativeTemplateClickHandlers;
-            string[] templateIdsArray = new string[unityAdLoader.TemplateIds.Count];
-            unityAdLoader.TemplateIds.CopyTo(templateIdsArray);
+            this.adTypes = new NativeAdTypes();
+            bool configureReturnUrlsForImageAssets = false;
 
-            NativeAdTypes adTypes = new NativeAdTypes();
-            if (unityAdLoader.AdTypes.Contains(NativeAdType.CustomTemplate))
+            if (clientArgs.AdTypes.Contains(NativeAdType.CustomTemplate))
             {
-                adTypes.CustomTemplateAd = true;
+                configureReturnUrlsForImageAssets = false;
+                adTypes.CustomTemplateAd = 1;
             }
-
             this.AdLoaderPtr = Externs.GADUCreateAdLoader(
                 this.adLoaderClientPtr,
-                unityAdLoader.AdUnitId,
+                clientArgs.AdUnitId,
                 templateIdsArray,
                 templateIdsArray.Length,
-                ref adTypes);
+                ref adTypes,
+                configureReturnUrlsForImageAssets);
 
             Externs.GADUSetAdLoaderCallbacks(
                 this.AdLoaderPtr,
@@ -72,7 +75,9 @@ namespace GoogleMobileAds.iOS
         internal delegate void GADUAdLoaderDidFailToReceiveAdWithErrorCallback(
             IntPtr AdLoader, string error);
 
-        public event EventHandler<CustomNativeEventArgs> OnCustomNativeTemplateAdLoaded;
+        public event EventHandler<CustomNativeClientEventArgs> OnCustomNativeTemplateAdLoaded;
+
+        public event EventHandler<CustomNativeClientEventArgs> OnCustomNativeTemplateAdClicked;
 
         public event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
 
@@ -120,20 +125,36 @@ namespace GoogleMobileAds.iOS
             IntPtr adLoader, IntPtr nativeCustomTemplateAd, string templateID)
         {
             AdLoaderClient client = IntPtrToAdLoaderClient(adLoader);
-            Action<CustomNativeTemplateAd, string> clickHandler =
-                    client.customNativeTemplateCallbacks.ContainsKey(templateID) ?
-                    client.customNativeTemplateCallbacks[templateID] : null;
+            CustomNativeTemplateClient adClient = new CustomNativeTemplateClient(
+                nativeCustomTemplateAd);
+            if (client.OnCustomNativeTemplateAdClicked != null &&
+                  client.TemplateIds[templateID] == true)
+            {
+                WeakReference weakClient = new WeakReference(adClient);
+                adClient.clickHandler = delegate(string assetName)
+                                    {
+                                        if (weakClient.IsAlive)
+                                        {
+                                            CustomNativeTemplateClient strongClient = weakClient.Target as CustomNativeTemplateClient;
+                                            CustomNativeClientEventArgs args = new CustomNativeClientEventArgs()
+                                            {
+                                                nativeAdClient = strongClient,
+                                                assetName = assetName
+                                            };
+                                            client.OnCustomNativeTemplateAdClicked(client, args);
+                                        }
+                                    };
+            }
 
             if (client.OnCustomNativeTemplateAdLoaded != null)
             {
-                CustomNativeEventArgs args = new CustomNativeEventArgs()
+                CustomNativeClientEventArgs args = new CustomNativeClientEventArgs()
                 {
-                    nativeAd = new CustomNativeTemplateAd(new CustomNativeTemplateClient(
-                        nativeCustomTemplateAd, clickHandler))
+                    nativeAdClient = adClient,
+                    assetName = null
                 };
                 client.OnCustomNativeTemplateAdLoaded(client, args);
             }
-
         }
 
         [MonoPInvokeCallback(typeof(GADUAdLoaderDidFailToReceiveAdWithErrorCallback))]
@@ -158,5 +179,4 @@ namespace GoogleMobileAds.iOS
         }
     }
 }
-
 #endif

@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_ANDROID
-
-using System;
 using System.Collections.Generic;
 
 using GoogleMobileAds.Common;
@@ -22,7 +19,7 @@ using UnityEngine;
 
 namespace GoogleMobileAds.Android
 {
-    public class CustomNativeTemplateClient : ICustomNativeTemplateClient
+    internal class CustomNativeTemplateClient : ICustomNativeTemplateClient
     {
         private AndroidJavaObject customNativeAd;
 
@@ -75,4 +72,4 @@ namespace GoogleMobileAds.Android
     }
 }
 
-#endif
+

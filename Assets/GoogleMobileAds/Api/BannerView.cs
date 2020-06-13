@@ -14,6 +14,7 @@
 
 using System;
 
+using GoogleMobileAds;
 using GoogleMobileAds.Common;
 
 namespace GoogleMobileAds.Api
@@ -25,19 +26,19 @@ namespace GoogleMobileAds.Api
         // Creates a BannerView and adds it to the view hierarchy.
         public BannerView(string adUnitId, AdSize adSize, AdPosition position)
         {
-            client = GoogleMobileAdsClientFactory.BuildBannerClient();
+            this.client = GoogleMobileAdsClientFactory.BuildBannerClient();
             client.CreateBannerView(adUnitId, adSize, position);
 
-            configureBannerEvents();
+            ConfigureBannerEvents();
         }
 
         // Creates a BannerView with a custom position.
         public BannerView(string adUnitId, AdSize adSize, int x, int y)
         {
-            client = GoogleMobileAdsClientFactory.BuildBannerClient();
+            this.client = GoogleMobileAdsClientFactory.BuildBannerClient();
             client.CreateBannerView(adUnitId, adSize, x, y);
 
-            configureBannerEvents();
+            ConfigureBannerEvents();
         }
 
         // These are the ad callback events that can be hooked into.
@@ -50,6 +51,9 @@ namespace GoogleMobileAds.Api
         public event EventHandler<EventArgs> OnAdClosed;
 
         public event EventHandler<EventArgs> OnAdLeavingApplication;
+
+        // Called when an ad is estimated to have earned money.
+        public event EventHandler<AdValueEventArgs> OnPaidEvent;
 
         // Loads an ad into the BannerView.
         public void LoadAd(AdRequest request)
@@ -75,11 +79,35 @@ namespace GoogleMobileAds.Api
             client.DestroyBannerView();
         }
 
-        private void configureBannerEvents()
+        // Returns the height of the BannerView in pixels.
+        public float GetHeightInPixels()
+        {
+            return client.GetHeightInPixels();
+        }
+
+        // Returns the width of the BannerView in pixels.
+        public float GetWidthInPixels()
+        {
+            return client.GetWidthInPixels();
+        }
+
+        // Set the position of the BannerView using standard position.
+        public void SetPosition(AdPosition adPosition)
+        {
+            client.SetPosition(adPosition);
+        }
+
+        // Set the position of the BannerView using custom position.
+        public void SetPosition(int x, int y)
+        {
+            client.SetPosition(x, y);
+        }
+
+        private void ConfigureBannerEvents()
         {
             this.client.OnAdLoaded += (sender, args) =>
             {
-                if(this.OnAdLoaded != null)
+                if (this.OnAdLoaded != null)
                 {
                     this.OnAdLoaded(this, args);
                 }
@@ -87,7 +115,7 @@ namespace GoogleMobileAds.Api
 
             this.client.OnAdFailedToLoad += (sender, args) =>
             {
-                if(this.OnAdFailedToLoad != null)
+                if (this.OnAdFailedToLoad != null)
                 {
                     this.OnAdFailedToLoad(this, args);
                 }
@@ -95,7 +123,7 @@ namespace GoogleMobileAds.Api
 
             this.client.OnAdOpening += (sender, args) =>
             {
-                if(this.OnAdOpening != null)
+                if (this.OnAdOpening != null)
                 {
                     this.OnAdOpening(this, args);
                 }
@@ -103,7 +131,7 @@ namespace GoogleMobileAds.Api
 
             this.client.OnAdClosed += (sender, args) =>
             {
-                if(this.OnAdClosed != null)
+                if (this.OnAdClosed != null)
                 {
                     this.OnAdClosed(this, args);
                 }
@@ -111,11 +139,26 @@ namespace GoogleMobileAds.Api
 
             this.client.OnAdLeavingApplication += (sender, args) =>
             {
-                if(this.OnAdLeavingApplication != null)
+                if (this.OnAdLeavingApplication != null)
                 {
                     this.OnAdLeavingApplication(this, args);
                 }
             };
+
+            this.client.OnPaidEvent += (sender, args) =>
+            {
+                if (this.OnPaidEvent != null)
+                {
+                    this.OnPaidEvent(this, args);
+                }
+            };
+
+        }
+
+        // Returns the mediation adapter class name.
+        public string MediationAdapterClassName()
+        {
+            return this.client.MediationAdapterClassName();
         }
     }
 }

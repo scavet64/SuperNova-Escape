@@ -16,11 +16,13 @@ using GoogleMobileAds.Api;
 
 namespace GoogleMobileAds.Common
 {
-    internal interface IAdLoaderClient
+    public interface IAdLoaderClient
     {
         event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
 
-        event EventHandler<CustomNativeEventArgs> OnCustomNativeTemplateAdLoaded;
+        event EventHandler<CustomNativeClientEventArgs> OnCustomNativeTemplateAdLoaded;
+
+        event EventHandler<CustomNativeClientEventArgs> OnCustomNativeTemplateAdClicked;
 
         void LoadAd(AdRequest request);
     }

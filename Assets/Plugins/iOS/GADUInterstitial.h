@@ -1,7 +1,8 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 
-@import Foundation;
-@import GoogleMobileAds;
+#import <Foundation/Foundation.h>
+
+#import <GoogleMobileAds/GoogleMobileAds.h>
 
 #import "GADUTypes.h"
 
@@ -33,6 +34,12 @@
 
 /// The will leave application callback into Unity.
 @property(nonatomic, assign) GADUInterstitialWillLeaveApplicationCallback willLeaveCallback;
+
+/// The paid event callback into Unity.
+@property(nonatomic, assign) GADUInterstitialPaidEventCallback paidEventCallback;
+
+// Returns the mediation adapter class name.
+@property(nonatomic, readonly, copy) NSString *mediationAdapterClassName;
 
 /// Makes an ad request. Additional targeting options can be supplied with a request object.
 - (void)loadRequest:(GADRequest *)request;

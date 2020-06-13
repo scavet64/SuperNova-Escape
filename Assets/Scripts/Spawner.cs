@@ -242,7 +242,10 @@ public class Spawner : MonoBehaviour {
 
         for (int i = 0; i < iterations; i++) 
         {
-            currentSpawnedRocks.Add((GameObject)  Instantiate(GetRandomAstroid(), new Vector3(getRandomFixedSide(), currenty), new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
+            currentSpawnedRocks.Add(Instantiate(
+                GetRandomAstroid(), 
+                new Vector3(getRandomFixedSide(), currenty), 
+                new Quaternion(Random.Range(0,360),Random.Range(0,360),0,0)));
             currenty += 2.5f;
         }
     }
