@@ -12,7 +12,7 @@ public class TapController : MonoBehaviour {
     void Start () {
         TapAnimator = this.GetComponent<Animator>();
         image = GetComponent<Image>();
-        float firstRock = Spawner.currentSpawnedRocks[0].transform.position.x;
+        float firstRock = Spawner.CurrentSpawnedRocks[0].transform.position.x;
         if(firstRock < 0) {
             //rock is on left
             this.transform.position += new Vector3(270, -275);

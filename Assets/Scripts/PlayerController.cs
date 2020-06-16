@@ -53,12 +53,12 @@ public class PlayerController : MonoBehaviour {
 
         this.score = 0;
         isGameOver = false;
-        requestBanner();
+        RequestBanner();
         GameController.control.timesPlayedToday++;
 
     }
 
-    void requestBanner() {
+    void RequestBanner() {
         try {
             AdvertManager.adManager.RequestBanner();
         } catch (Exception e) {
@@ -66,41 +66,41 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public void moveShip(int i) {
-        if (isMoveValid()) {
+    public void MoveShip(int i) {
+        if (IsMoveValid()) {
             
             //determine which animation to play
             if (i == leftButtonSender) {
                 if (isShipOnLeft) {
                     //LeftToLeft
-                    playMoveAnimation("UpWiggleRight");
+                    PlayMoveAnimation("UpWiggleRight");
                 } else {
                     //rightToLeft
-                    playMoveAnimation("RightToLeft");
+                    PlayMoveAnimation("RightToLeft");
                     isShipOnLeft = true;
                 }
             } else {
                 //rightbutton is sender
                 if (isShipOnLeft) {
                     //leftToRight
-                    playMoveAnimation("LeftToRight");
+                    PlayMoveAnimation("LeftToRight");
                     isShipOnLeft = false;
                 } else {
                     //rightToRight
-                    playMoveAnimation("UpWiggleLeft");
+                    PlayMoveAnimation("UpWiggleLeft");
                 }
             }
 
-            playMovementAudio();
-            rockSpawner.spawnRocksIfNeeded();
-            rockSpawner.spawnBackgroundIfNeeded();
-            incrementScore();
-            moveCamera();
-            moveBackground();
+            PlayMovementAudio();
+            rockSpawner.SpawnRocksIfNeeded();
+            rockSpawner.SpawnBackgroundIfNeeded();
+            IncrementScore();
+            MoveCamera();
+            MoveBackground();
         }
     }
 
-    private void playMovementAudio() {
+    private void PlayMovementAudio() {
         audioSource.clip = movementSounds[UnityEngine.Random.Range(0, movementSounds.Length - 1)];
         audioSource.Play();
     }
@@ -124,14 +124,14 @@ public class PlayerController : MonoBehaviour {
             //Game over
             AddExplosionForce(otherBox.GetComponent<Rigidbody2D>(), 100, this.transform.position, 3f);
             Instantiate(explosionPrefab, this.transform.position, Quaternion.identity);
-            triggerEndGame();
+            TriggerEndGame();
         }
     }
 
     /// <summary>
     /// check to see if this score is better than previous and store data locally
     /// </summary>
-    void collectAndStoreData() {
+    private void CollectAndStoreData() {
         if (controller.bestDistance < score) {
             //new Best!
             controller.bestDistance = score;
@@ -141,7 +141,7 @@ public class PlayerController : MonoBehaviour {
         controller.save();
     }
 
-    void reportAchievementProgress() {
+    private void ReportAchievementProgress() {
 
 			GameCenterController.reportProgressForAchievement("grp.25Jumps.05acfb57f71b4a58bf29632aadbbaaf", score / 25);
             GameCenterController.reportProgressForAchievement("grp.50Jumps.0b812bd06d1f430a8d1467323a43b443", score / 50);
@@ -156,13 +156,13 @@ public class PlayerController : MonoBehaviour {
     /// <summary>
     /// Trigger the endgame.
     /// </summary>
-    private void triggerEndGame() {
+    private void TriggerEndGame() {
 
         isGameOver = true;
-        collectAndStoreData();
-        reportAchievementProgress();
-        showEndScreen();
-        showInterstialIfNeeded();
+        CollectAndStoreData();
+        ReportAchievementProgress();
+        ShowEndScreen();
+        ShowInterstialIfNeeded();
 
         //display this score
         endScoreText.GetComponent<Text>().text = score.ToString();
@@ -175,41 +175,41 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    private void showInterstialIfNeeded() {
+    private void ShowInterstialIfNeeded() {
         Debug.Log(GameController.control.timesPlayedToday);
         if (GameController.control.timesPlayedToday % 3 == 0) {
             Debug.Log("Showing Interstitial");
             Debug.Log(GameController.control.timesPlayedToday);
-            AdvertManager.adManager.showInterstitial();
+            AdvertManager.adManager.ShowInterstitial();
         } else if (GameController.control.timesPlayedToday % 3 == 1) {
             AdvertManager.adManager.RequestInterstitial();
         }
     }
 
-    public void incrementScore() {
+    public void IncrementScore() {
         score++;
         distanceText.text = "Score: " + score;
     }
 
-    private void showEndScreen() {
+    private void ShowEndScreen() {
         //hide in game overlay
         inGameGUI.SetActive(false);
         losePanelAnimator.Play("MoveOver");
     }
 
-    private bool isMoveValid() {
+    private bool IsMoveValid() {
         return playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Waiting") && cameraAnimator.GetCurrentAnimatorStateInfo(0).IsName("Waiting") && !isGameOver;
     }
 
-    private void moveCamera() {
+    private void MoveCamera() {
         cameraAnimator.Play("moveCameraUp");
     }
 
-    private void moveBackground() {
+    private void MoveBackground() {
         backgroundAnimator.Play("Move");
     }
 
-    private void playMoveAnimation(string animationName) {
+    private void PlayMoveAnimation(string animationName) {
         Debug.Log(animationName);
         playerAnimator.Play(animationName);
     }

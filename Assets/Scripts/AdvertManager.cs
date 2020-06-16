@@ -13,7 +13,6 @@ public class AdvertManager : MonoBehaviour {
 
     private BannerView bannerView;
     private InterstitialAd interstitial;
-    private static string outputMessage = "";
 
 	/// <summary>
 	/// The ios ad identifiers. Set these using the ids from AdMob
@@ -34,6 +33,7 @@ public class AdvertManager : MonoBehaviour {
             Destroy(gameObject);
         } else {
             adManager = this;
+            MobileAds.Initialize(initStatus => { });
             GameObject.DontDestroyOnLoad(gameObject);
         }
     }
@@ -44,8 +44,6 @@ public class AdvertManager : MonoBehaviour {
     public void RequestBanner() {
 #if UNITY_EDITOR
         string adUnitId = "unused";
-#elif UNITY_ANDROID
-			string adUnitId = iosBannerAdID;
 #elif UNITY_IPHONE
 			string adUnitId = iosBannerAdID;
 #else
@@ -68,7 +66,7 @@ public class AdvertManager : MonoBehaviour {
 	/// <summary>
 	/// Destories the banner.
 	/// </summary>
-    public void destoryBanner() {
+    public void DestoryBanner() {
         bannerView.Destroy();
     }
 
@@ -78,8 +76,6 @@ public class AdvertManager : MonoBehaviour {
     public void RequestInterstitial() {
 #if UNITY_EDITOR
         string adUnitId = "unused";
-#elif UNITY_ANDROID
-		string adUnitId = iosIntersitialAdID;
 #elif UNITY_IPHONE
 		string adUnitId = iosIntersitialAdID;
 #else
@@ -101,7 +97,7 @@ public class AdvertManager : MonoBehaviour {
 	/// <summary>
 	/// Shows the interstitial.
 	/// </summary>
-    public void showInterstitial() {
+    public void ShowInterstitial() {
         interstitial.Show();
     }
 
